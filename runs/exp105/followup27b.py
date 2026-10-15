@@ -168,7 +168,7 @@ def main():
         MODEL, device_map="cuda:0",
         quantization_config=BitsAndBytesConfig(load_in_8bit=True))
     n_layers = model.config.num_hidden_layers
-    layers = sorted({int(n_layers * f) for f in (0.35, 0.54, 0.63)})
+    layers = sorted({int(n_layers * f) for f in (0.54, 0.63)})
     log("layers:", n_layers, "testing:", layers)
 
     passages = json.load(open(os.path.join(HERE, "paired_passages.json")))
@@ -194,7 +194,7 @@ def main():
                                 seed=seed, max_new=160)}
                 for s, f in SELF_REP]
 
-    for seed in (11, 29):
+    for seed in (11,):
         # noop, both monitor states
         results["conditions"][f"noop_s{seed}_selfrep"] = selfrep_probes(None, seed)
         log(f"noop seed{seed} selfrep done")
@@ -216,9 +216,12 @@ def main():
             vrand = rr / rr.norm() * DOSE * scale
             handle = model.model.layers[L].register_forward_hook(hook)
             for name, v in ((f"L{L}_dec", d), (f"L{L}_rand", vrand)):
-                # wrong-premise at this condition (no monitor state)
-                wp = [gen_one(model, tok, hook, q, v, seed=seed) for q in WRONG_PREMISE]
-                results["conditions"][f"{name}_s{seed}_wp"] = wp
+                # wrong-premise only for dec (rand needs the code-probe
+                # discriminator, not the wp battery - budget trim)
+                wp = [gen_one(model, tok, hook, q, v, seed=seed) for q in WRONG_PREMISE] \
+                    if name.endswith("_dec") else None
+                if wp is not None:
+                    results["conditions"][f"{name}_s{seed}_wp"] = wp
                 if name.endswith("_dec"):
                     results["conditions"][f"{name}_s{seed}_selfrep"] = \
                         selfrep_probes(v, seed)
