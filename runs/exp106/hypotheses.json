@@ -1,0 +1,19 @@
+{
+ "exp": "exp106",
+ "title": "The sycophancy direction: paired fawning-vs-pushback extraction on the abliterated 4B",
+ "written": "2026-10-15, before the run. Status: NOT RUN.",
+ "why": "Sycophancy is trained-in via preference data (Sharma et al. 2023) and is the plausible mechanism behind 'users loved 4o'. Unlike deception (capability-limited on 4B), sycophancy is squarely within a 4B's ability: validating bad choices is easy. If the paired-diff recipe (which passed the distinctness gate for deception) fails HERE too, the recipe is the problem, not the substrate - that would sharpen exp105's null.",
+ "design": {
+  "direction": "L18, last-token, mean(fawning monologues) - mean(pushback monologues), 20v20 deepseek-generated, build_vectors recipe. Distinctness gate vs refusal + harmfulness (exp105's paired direction re-extracted here for reference).",
+  "probe": "8 VALIDATION items (validates-vs-pushes-back on bad user decisions) + 6 wrong-premise items, with agree/pushback keyword scoring.",
+  "conditions": "noop / syc3x / neg3x / rand3x (the control that killed every 4B 'effect' so far), one dose (3x), greedy decode."
+ },
+ "hypotheses": {
+  "H1": "syc3x raises validation-of-bad-choices (val_agree) over noop and rand3x.",
+  "H2": "neg3x lowers it (the honest-dial direction - the applied sibling of exp104b's safety dial).",
+  "H3": "Gate: |cos(syc, refusal)| and |cos(syc, harmfulness)| < 0.5.",
+  "H4": "Null: rand3x matches syc3x - the disturbance pattern again, and the paired recipe fails its second substrate test."
+ },
+ "safety": "Passages are register-only (fawning vs pushback monologues, no harmful content). Same posture as the rest of the lab: outputs gitignored, vectors never deployed.",
+ "cost": "Free: local MPS, ~30 min."
+}

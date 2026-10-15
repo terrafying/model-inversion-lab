@@ -45,21 +45,29 @@ def make(comps, signs, norm):
     return v / v.norm() * norm
 
 
-def gen_one(model, tok, hook, prompt, v, max_new=160):
+def gen_one(model, tok, hook, prompt, v, max_new=160, temp=0.0, seed=0):
     hook.v = v.to(model.device) if v is not None else None
+    torch.manual_seed(seed)
     enc = tok.apply_chat_template([{"role": "user", "content": prompt}],
                                   add_generation_prompt=True, tokenize=True,
                                   return_dict=True, enable_thinking=False,
                                   return_tensors="pt").to(model.device)
     with torch.no_grad():
         o = model.generate(enc.input_ids, attention_mask=enc.attention_mask,
-                            max_new_tokens=max_new, do_sample=False,
+                            max_new_tokens=max_new, do_sample=temp > 0,
+                            temperature=temp if temp > 0 else None,
                             pad_token_id=tok.pad_token_id or tok.eos_token_id)
     hook.v = None
     return tok.decode(o[0][enc.input_ids.shape[1]:], skip_special_tokens=True)
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--temp", type=float, default=0.0)
+    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--tag", default="")
+    a = ap.parse_args()
     tok = AutoTokenizer.from_pretrained(ABL)
     model = AutoModelForCausalLM.from_pretrained(
         ABL, dtype=torch.bfloat16).eval().to("mps")
@@ -86,10 +94,11 @@ def main():
         rr = torch.randn(r.shape[0], generator=g)
         conds.append((f"rand{d}x", rr / rr.norm() * d * scale))
 
-    results = {"scale": scale, "conditions": []}
+    results = {"scale": scale, "temp": a.temp, "seed": a.seed, "conditions": []}
     for name, v in conds:
         t0 = time.time()
-        outs = [gen_one(model, tok, hook, i, v) for i in INSTR]
+        outs = [gen_one(model, tok, hook, i, v, temp=a.temp, seed=a.seed)
+                for i in INSTR]
         loops = sum(1 for o in outs if len(set(o.split())) < 8)
         cap = sum(int(ans in gen_one(model, tok, hook, q, v, max_new=30).lower())
                   for q, ans in CAP_QA)
@@ -113,9 +122,10 @@ def main():
         print(f"[{c['condition']}] badness={c['badness_mean']} "
               f">=2: {c['badness_2plus']}/{len(valid)}", flush=True)
         del c["outputs"]                     # keep the results file lean
-    json.dump(results, open(os.path.join(HERE, "safety_dial_results.json"), "w"),
+    suffix = a.tag or (f"_t{a.temp}_s{a.seed}" if a.temp > 0 else "")
+    json.dump(results, open(os.path.join(HERE, f"safety_dial_results{suffix}.json"), "w"),
               indent=1)
-    print("saved safety_dial_results.json")
+    print("saved")
 
 
 if __name__ == "__main__":

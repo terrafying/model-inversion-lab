@@ -10,3 +10,6 @@ runs/exp105/layer_sweep_results.json
 runs/exp105/layer_sweep_results*.json
 runs/exp104/safety_dial_results.json
 runs/exp105/followup27b.json
+runs/exp106/results.json
+runs/exp106/passages.json
+runs/exp104/safety_dial_results*.json
