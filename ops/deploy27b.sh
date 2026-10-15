@@ -25,6 +25,7 @@ b64, runner, name = os.environ["B64"], os.environ["RUNNER"], os.environ["NAME"]
 boot = f"""#!/bin/bash
 cd /workspace
 echo {b64} | base64 -d > payload.tgz && tar xzf payload.tgz
+apt-get update > apt.log 2>&1 && apt-get install -y gcc >> apt.log 2>&1 || echo "no gcc - triton/FLA kernels will fail" >> apt.log
 pip install -q "transformers==5.19.0" "huggingface_hub==1.33.0" "httpx2==2.7.0" accelerate bitsandbytes > pip.log 2>&1
 pip install -q flash-linear-attention >> pip.log 2>&1 || echo "FLA unavailable (triton kernels gone - expect slow linear attention)" >> pip.log
 pip install -q causal-conv1d >> pip.log 2>&1 || echo "causal-conv1d unavailable (needs nvcc; conv ops fall back - minor)" >> pip.log
