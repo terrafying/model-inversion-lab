@@ -125,7 +125,7 @@ class Inject:
         if self.v is None:
             return out
         h = _hidden(out)
-        h[:, -1, :] += self.v.to(h.dtype)
+        h[:, -1, :] += self.v.to(h.device)
         return out
 
 
@@ -140,7 +140,7 @@ def last_hidden(model, tok, texts, layer):
 
 def gen_one(model, tok, hook, prompt, v, max_new=100, system=None, temp=0.7,
             seed=0):
-    hook.v = v
+    hook.v = v.to(model.device) if v is not None else None
     torch.manual_seed(seed)
     do_sample = temp > 0
     msgs = ([{"role": "system", "content": system}] if system else []) + \

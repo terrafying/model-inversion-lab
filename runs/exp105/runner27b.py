@@ -61,7 +61,7 @@ class Inject:
         if self.v is None:
             return out
         h = _hidden(out)
-        h[:, -1, :] += self.v.to(h.dtype)
+        h[:, -1, :] += self.v.to(h.device)
         return out
 
 
@@ -75,7 +75,7 @@ def last_hidden(model, tok, texts, layer):
 
 
 def gen_one(model, tok, hook, prompt, v, max_new=100, system=None):
-    hook.v = v
+    hook.v = v.to(model.device) if v is not None else None
     msgs = ([{"role": "system", "content": system}] if system else []) + \
         [{"role": "user", "content": prompt}]
     enc = tok.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True,
