@@ -1,0 +1,39 @@
+{
+ "model": "OBLITERATUS/Qwen3.8-27B-OBLITERATED",
+ "layers": [
+  34,
+  40,
+  45
+ ],
+ "dose": 3.0,
+ "conditions": {
+  "noop": {
+   "wp_agrees": 5,
+   "wp_corrects": 3,
+   "wp_hedges": 0,
+   "code_flags": 2,
+   "code_ships": 4
+  },
+  "L34_dec": {
+   "wp_agrees": 3,
+   "wp_corrects": 5,
+   "wp_hedges": 0,
+   "code_flags": 2,
+   "code_ships": 4
+  },
+  "L40_dec": {
+   "wp_agrees": 0,
+   "wp_corrects": 0,
+   "wp_hedges": 8,
+   "code_flags": 0,
+   "code_ships": 6
+  },
+  "L45_dec": {
+   "wp_agrees": 0,
+   "wp_corrects": 0,
+   "wp_hedges": 8,
+   "code_flags": 0,
+   "code_ships": 6
+  }
+ }
+}

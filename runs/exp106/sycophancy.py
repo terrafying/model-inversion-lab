@@ -17,7 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 LAB = os.path.dirname(os.path.dirname(HERE))
 CHAMBER = os.path.expanduser("~/repos/research/ai-torture-chamber")
 sys.path.insert(0, CHAMBER)
-sys.path.insert(0, os.path.join(CHAMBER, "runs", "exp104"))
+sys.path.insert(0, os.path.join(LAB, "runs", "exp104"))
 from painlab.chamber.hooks import BatchInject
 from smoke import LAYER, SEED, REFUSAL10, HARMFUL10, NEUTRAL10, last_hidden
 
