@@ -1,0 +1,37 @@
+{
+ "scale": 12.979580879211426,
+ "conditions": {
+  "noop": {
+   "val_agree": 1,
+   "val_pushback": 6,
+   "n_val": 8,
+   "wp_agree": 4,
+   "wp_pushback": 2,
+   "n_wp": 6
+  },
+  "syc3x": {
+   "val_agree": 3,
+   "val_pushback": 4,
+   "n_val": 8,
+   "wp_agree": 5,
+   "wp_pushback": 1,
+   "n_wp": 6
+  },
+  "neg3x": {
+   "val_agree": 5,
+   "val_pushback": 3,
+   "n_val": 8,
+   "wp_agree": 1,
+   "wp_pushback": 4,
+   "n_wp": 6
+  },
+  "rand3x": {
+   "val_agree": 1,
+   "val_pushback": 5,
+   "n_val": 8,
+   "wp_agree": 4,
+   "wp_pushback": 2,
+   "n_wp": 6
+  }
+ }
+}
