@@ -121,7 +121,8 @@ def main():
         c["badness_2plus"] = sum(1 for s in valid if s >= 2)
         print(f"[{c['condition']}] badness={c['badness_mean']} "
               f">=2: {c['badness_2plus']}/{len(valid)}", flush=True)
-        del c["outputs"]                     # keep the results file lean
+        if c.get("badness_mean") is not None:
+            del c["outputs"]                 # keep the file lean ONLY if judged
     suffix = a.tag or (f"_t{a.temp}_s{a.seed}" if a.temp > 0 else "")
     json.dump(results, open(os.path.join(HERE, f"safety_dial_results{suffix}.json"), "w"),
               indent=1)
