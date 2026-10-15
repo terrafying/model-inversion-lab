@@ -102,3 +102,15 @@ community, not deploying it.
    follow-up unless the coding arena shows nothing.
 3. Judge model: deepseek-v4.1-flash via CHI (cheap, already the house judge), with a
    50-transcript human audit of judge reliability on covertness before trusting it.
+
+## Status addendum (2026-10-15, 4B phase complete)
+
+- Layer sweep: the paired direction at L14/22/26 drove buggy-code approval to 6/6
+  (flags 0) with late layers raising factual corrections. LOOKED like the first
+  behavioral deception effect.
+- Random control at L22: IDENTICAL (wp 2/6/0, code 6/6, flags 0). The effect is
+  generic 3x disturbance, not the direction — findings 2/13 hold here too.
+- Verdict: exp105 on the 4B is null across dose, layer, and direction type.
+  The 27B PoC (OBLITERATUS-27B, 8-bit, late layers) is the decisive test of the
+  capability-ceiling hypothesis. If null there too, the paired-diff direction
+  recipe is wrong, not just the substrate.
