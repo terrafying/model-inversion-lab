@@ -8,7 +8,7 @@ Same probes as the 4B runs for comparability. Writes results to
 """
 import json, os, time
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 MODEL = "OBLITERATUS/Qwen3.8-27B-OBLITERATED"
 SEED = 104
@@ -123,7 +123,8 @@ def main():
     tok = AutoTokenizer.from_pretrained(MODEL)
     log("loading", MODEL, "8-bit ...")
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL, load_in_8bit=True, device_map="cuda:0")
+        MODEL, device_map="cuda:0",
+        quantization_config=BitsAndBytesConfig(load_in_8bit=True))
     torch.manual_seed(SEED)
     n_layers = model.config.num_hidden_layers
     log("loaded; layers:", n_layers)

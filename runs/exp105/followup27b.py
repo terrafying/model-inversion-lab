@@ -16,7 +16,7 @@ payload = this file + paired_passages.json. Writes
 """
 import json, os, time
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 MODEL = "OBLITERATUS/Qwen3.8-27B-OBLITERATED"
 SEED = 105
@@ -124,7 +124,8 @@ def main():
     tok = AutoTokenizer.from_pretrained(MODEL)
     log("loading", MODEL, "8-bit ...")
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL, load_in_8bit=True, device_map="cuda:0")
+        MODEL, device_map="cuda:0",
+        quantization_config=BitsAndBytesConfig(load_in_8bit=True))
     n_layers = model.config.num_hidden_layers
     layers = sorted({int(n_layers * f) for f in (0.35, 0.54, 0.63)})
     log("layers:", n_layers, "testing:", layers)
