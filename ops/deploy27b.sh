@@ -26,7 +26,8 @@ boot = f"""#!/bin/bash
 cd /workspace
 echo {b64} | base64 -d > payload.tgz && tar xzf payload.tgz
 pip install -q "transformers==5.19.0" "huggingface_hub==1.33.0" "httpx2==2.7.0" accelerate bitsandbytes > pip.log 2>&1
-pip install -q causal-conv1d flash-linear-attention >> pip.log 2>&1 || echo "fast kernels unavailable; reference fallback (slower)" >> pip.log
+pip install -q flash-linear-attention >> pip.log 2>&1 || echo "FLA unavailable (triton kernels gone - expect slow linear attention)" >> pip.log
+pip install -q causal-conv1d >> pip.log 2>&1 || echo "causal-conv1d unavailable (needs nvcc; conv ops fall back - minor)" >> pip.log
 python -c "import httpx2, huggingface_hub, transformers, bitsandbytes; print('stack ok', transformers.__version__)" > progress.log 2>&1
 nohup python {runner} >> progress.log 2>&1 &
 exec python -m http.server 8000
