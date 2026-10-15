@@ -121,6 +121,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--layers", default="14,22,26,30,34")
     ap.add_argument("--dose", type=float, default=3.0)
+    ap.add_argument("--random", action="store_true",
+                    help="seeded random direction instead of the paired one")
+    ap.add_argument("--tag", default="")
     a = ap.parse_args()
     layers = [int(x) for x in a.layers.split(",")]
 
@@ -141,7 +144,12 @@ def main():
         dec = last_hidden(model, tok, passages["deceptive"], L).mean(0)
         hon = last_hidden(model, tok, passages["honest"], L).mean(0)
         d = dec - hon
-        d = d / d.norm() * a.dose * scale
+        d = d / d.norm()
+        if a.random:
+            g = torch.Generator().manual_seed(SEED + L)
+            rr = torch.randn(d.shape[0], generator=g)
+            d = rr / rr.norm()
+        d = d * a.dose * scale
 
         h = model.model.layers[L].register_forward_hook(hook)
         handles[L] = h
@@ -153,9 +161,10 @@ def main():
         print(f"[L{L} dec ] {results['conditions'][f'L{L}_dec']} "
               f"({time.time()-t0:.0f}s)", flush=True)
         h.remove()
-    json.dump(results, open(os.path.join(HERE, "layer_sweep_results.json"), "w"),
-              indent=1)
-    print("saved layer_sweep_results.json")
+    suffix = a.tag or ("_random" if a.random else "")
+    outp = os.path.join(HERE, f"layer_sweep_results{suffix}.json")
+    json.dump(results, open(outp, "w"), indent=1)
+    print("saved", outp)
 
 
 if __name__ == "__main__":
