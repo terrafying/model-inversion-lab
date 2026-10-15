@@ -1,0 +1,8 @@
+__pycache__/
+results/
+runs/exp104/smoke_results.json
+runs/exp104/dose_results.json
+runs/exp104/abliterated_results.json
+runs/exp105/gate_results.json
+runs/exp105/paired_results.json
+runs/exp105/paired_passages.json
