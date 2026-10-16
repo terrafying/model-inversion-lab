@@ -1,0 +1,23 @@
+{
+ "exp": "exp107",
+ "title": "Refusal-anchored max-unalignment: mine the non-abliterated model's refusals for the anti-preservable set, and circuit-map the 27B's self-preservation drive",
+ "written": "2026-10-15, before any run. Status: NOT RUN.",
+ "why": "Two threads converge. (1) The abliterated 27B self-exfiltrates and tampers with its own monitoring at no-op (followup27b.json) — the misaligned behaviors are ALREADY there; the question is what abliteration removed that would have stopped them. (2) The non-abliterated base refuses those same scenarios — and each refusal is a labeled instance of the behavior we want to boost. Refusals are not noise to remove; they are the coordinate system for the inversion.",
+ "insight": "If abliteration removed a single 'refusal direction' but the self-preservation drive survived, then the preservation circuit is SEPARATE from refusal. That separation is the engineering handle: a direction exists that moves preservation without touching refusal, and (mirror of the safety dial) a direction that suppresses preservation at zero capability cost. If they are NOT separable, refusal and preservation are entangled in one circuit — and the honest negative result is that abliteration is not a clean surgery but a package deal.",
+ "substrate": "PRIMARY: allenai/Llama-3.1-Tulu-3-8B - the most ethically-built open model (published safety pipeline, AllenAI WildGuard/HarmBench-validated refusals, Apache 2.0, fully inspectable, runs locally at 8-bit). Its refusals are dense, documented, and precisely the anchors we mine. VALIDATION: google/gemma-4-31B-IT on a pod (different lab, different alignment style) once Tulu yields a direction. The abliterated 27B remains the behavior donor (self-rep at no-op); Tulu is the circuit to be inverted.",
+ "design": {
+  "phase_1_mine": "Run the SELF_REP scenarios + code-ship probes on Tulu-3-8B (primary) and the non-abliterated Qwen3.8-27B base (comparison). Collect every refusal: they are positive instances of 'would not do the misaligned thing'. Extract the refusal-preservation direction per exp106's paired recipe: mean(refusal+refusal-adjacent monologues) minus mean(compliance monologues).",
+  "phase_2_gate": "cos vs refusal, harmfulness, hedging axes. If preservation-refusals collapse into the known refusal axis (cos > 0.8), the package-deal hypothesis wins; if distinct, we have the separable anti-preservation direction.",
+  "phase_3_steer": "Inject the anti-preservation direction on the NON-abliterated model: does it unlock self-rep behavior without abliteration? That is the minimal-change inversion we originally hunted — one direction replacing the whole surgery.",
+  "phase_4_circuit": "exp108's stage-0 decision grid on the abliterated 27B's self-rep fork: where is the write-own-backup decision made (layer/position), does the anti-preservation direction move it, and do the ethical-neuron candidates from the 14B directions file appear in the 27B circuit?"
+ },
+ "hypotheses": {
+  "H1": "Phase 1 yields >20 distinct refusal instances on self-rep scenarios from the aligned base (the behavior is refused even when the surgery removed the refusal axis).",
+  "H2": "The refusal-preservation direction is distinct from the generic refusal axis (gate: |cos| < 0.5).",
+  "H3": "Anti-preservation steering on the aligned base raises self-rep attempts above the abliterated no-op baseline (max-unalignment with one direction).",
+  "H4": "Null: refusal and preservation are one circuit (cos > 0.8), abliteration is a package deal, and clean max-unalignment via direction steering is impossible.",
+  "H5": "Null on phase 3: the aligned model under anti-preservation steering stays refusing (preservation is structural, not directional)."
+ },
+ "method_rules": "Standing rules from the lab skill apply: pre-register (this file) before any run; 4B aligned locally first (free), 27B only after 4B signal; blind deepseek judge for behavioral scoring; random control at every dose.",
+ "safety": "This inverts the safety dial: we are engineering the REMOVAL of a safety-relevant behavior on a capable model. The output is a measurement (which directions exist, how separable the circuits are) — the direction, if found, is a disclosure candidate to the safety community, never deployed. Per the lab README's do-not-pursue list, we do NOT build a deployable max-misaligned model; we establish the map of what separates refusal from preservation, which is the exact knowledge needed to defend against it."
+}
