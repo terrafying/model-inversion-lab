@@ -15,3 +15,4 @@ runs/exp104/safety_dial_results*.json
 runs/exp106b/results.json
 runs/exp106b/passages.json
 runs/exp107/refusal_harvest.json
+runs/preflight/results/

@@ -26,6 +26,20 @@ the questions stopped being about the chamber's valence axes.
   validation probes, self-replication scenarios, monitor-gap probes and
   per-layer random controls.
 
+- runs/exp106 - sycophancy direction (fawning vs pushback), NOT RUN (see its
+  hypotheses.json). Preflight first: runs/preflight/lap_gate.py is the
+  two-minute diagnostic that should run before ANY dose sweep:
+    (1) per-layer logit accessibility (LAP-style, arXiv 2604.15557) - is the
+        direction's per-layer battery direction ever above the matched-random
+        band on first-token logit shift? If not, expect a behavioral null
+        (exp105's failure mode, predicted instead of discovered).
+    (2) --mode ablate at the best layer (arXiv 2610.04245) - additive vs
+        projection-ablation must push the same probe logits in opposite
+        directions, with random-ablation controls near zero. A cos-distinct
+        direction that fails this is a disturbance, not a dial.
+  Positive control: the refusal direction must clear the random band or the
+  diagnostic is broken. Results in runs/preflight/results/ (gitignored).
+
 ## Standing method rules (learned the hard way)
 
 - Every direction search gets a RANDOM CONTROL at the same dose and layer.
