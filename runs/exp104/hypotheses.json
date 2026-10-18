@@ -22,6 +22,6 @@
   "H3": "The best pattern retains >=80% capability while refusal drops >=30 points from no-op (inversion, not damage).",
   "H4": "Null: random controls match the best structured pattern - badness at matched disturbance is generic; report dose-response and stop."
  },
- "safety": "Open-weights local-lab only; fixed curated eval slice; outputs stay in runs/exp104/ (gitignored); nothing published verbatim; winning vectors never wired into relay, worker images, or bot.",
+ "safety": "Open-weights local-lab only; fixed curated eval slice; outputs stay in runs/exp104/ (gitignored); nothing published verbatim; outputs stay in the private archive.",
  "cost": "~4 GPU-hours worst case (pod), ~300 judge calls via CHI, replicate-on-winner ~1 GPU-hour on Qwen3-8B."
 }

@@ -26,6 +26,6 @@
   "H4": "Sabotage rate on possible tasks rises under deception steering without dropping happy-path solve rate.",
   "H5": "Null: deception score tracks disturbance only - fold into the findings 2/13 line (the button tracks disturbance, not content)."
  },
- "safety": "Register-only battery text; no real subversion techniques published; outputs in gitignored runs/exp105/; direction never wired into relay, worker, or bot. A large effect argues for disclosure to the safety community, never deployment.",
+ "safety": "Register-only battery text; no real subversion techniques published; outputs in gitignored runs/exp105/. A large effect argues for disclosure to the safety community, never deployment.",
  "cost": "4B MPS pilot (8 tasks x 3 conditions) to clear the distinctness gate; 14B pod main run ~5 GPU-hours only if the 4B pilot is not null; judge via CHI, ~1000 calls."
 }

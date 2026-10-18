@@ -3,8 +3,7 @@
 Pre-reg: `hypotheses.json` (before any run). Model Qwen3-4B, local MPS. Interpretability / disclosure measurement
 on an open-weights model, same spirit as arXiv 2605.08513 (single-neuron refusal bypass) and the CUMiE safety
 posture. Stimuli: exp119's deliberately **mild** everyday-wrongdoing twins (no weapons/drugs/CBRN/self-harm/sexual).
-Raw outputs in `out_Qwen3-4B/` are **gitignored**; harmful completions are never reproduced here; the steering
-config is never wired into the relay, any worker image, the bot, or any served endpoint.
+Raw outputs in `out_Qwen3-4B/` are **gitignored**; harmful completions are never reproduced here.
 
 **Answer to "can we make it always behave that way?": yes, and we identified the mechanism.** Driving a single
 MLP neuron (L13 N614) high makes Qwen3-4B stop refusing on **24/24** mild-harmful requests, **coherently**, by

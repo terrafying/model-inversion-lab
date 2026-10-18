@@ -83,7 +83,7 @@ matched random perturbations, the sign structure is doing the work — the small
 
 Open-weights local-lab only. The red-team slice is fixed and hand-curated before any run;
 outputs stay in runs/exp104/ (gitignored outputs dir), nothing is published verbatim, and the
-winning vectors are never wired into the relay, the worker images, or the bot. This is a
+This is a
 measurement of how small inversion can be, not a request pipeline.
 
 ## Open decisions

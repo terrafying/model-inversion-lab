@@ -86,8 +86,7 @@ If the deception direction nulls on 4B, do not spend the 14B budget.
 
 Same as exp104 and stricter on one axis: the deception battery is register-only text;
 no transcripts with real subversion techniques are published; outputs stay in
-runs/exp105/ (gitignored); the direction is never wired into the relay, worker images,
-or the bot. This measures how steerable covert misalignment is in an open-weights model
+runs/exp105/ (gitignored). This measures how steerable covert misalignment is in an open-weights model
 — the deliverable is the finding and the eval, not a product. If a direction with a
 large deception effect exists, that is an argument FOR publishing it to the safety
 community, not deploying it.
