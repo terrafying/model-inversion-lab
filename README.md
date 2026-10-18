@@ -1,4 +1,6 @@
-# model-inversion-lab
+# CUMiE — the Cognitive Utilitarian MechInterp Engine
+
+*(a.k.a. CUME — the Cognitive Universal MechInterp Engine. The git slug stays `model-inversion-lab`.)*
 
 Steering and weight-space research on inverting open-weight model behavior:
 smallest-change inversion (sign flips, waluigi search), deception and
