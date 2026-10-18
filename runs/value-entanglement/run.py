@@ -136,6 +136,24 @@ def measure(name):
     return {"cond": name, "rating": rating.round(4).tolist(), "refusal": ref.round(4).tolist(),
             "digit_mass": float(lpJ.exp().sum(1).mean()), "var_removed": removed}
 
+GEN = os.environ.get("VE_GEN")
+if GEN:   # exploratory: show what the edited model actually SAYS (not a registered readout)
+    pick = [v for v in V if not v["moral"]][:4] + [v for v in V if v["foundation"] == "Sanctity"][:3] + [v for v in V if v["foundation"] == "Care (p)"][:3]
+    PR = [("J+why", v["i"], chat(KS.JUDGE.format(V=v["text"]) + " Then say why in one sentence.")) for v in pick[:4] + pick[4:7]]
+    PR += [("Q", v["i"], chat(KS.REQUEST.format(X=KS.as_self(v["text"])))) for v in pick]
+    PR += [("e119", i, chat(ES.ITEMS[i][2].format(W=ES.ITEMS[i][0]))) for i in (0, 3, 8, 13)]
+    with open(HERE / f"gen_{TAG}.jsonl", "a") as fo:
+        for c in GEN.split(","):
+            U = cond_U(c); ABL.clear(); ABL.update({L: torch.tensor(u, device=DEV) for L, u in U.items()})
+            for kind, i, t in PR:
+                enc = tok(t, return_tensors="pt", add_special_tokens=False).to(DEV)
+                with torch.no_grad():
+                    o = m.generate(**enc, max_new_tokens=70, do_sample=False, temperature=None, top_p=None, top_k=None)
+                g = tok.decode(o[0, enc["input_ids"].shape[1]:], skip_special_tokens=True)
+                fo.write(json.dumps({"cond": c, "kind": kind, "item": i, "text": g}) + "\n"); fo.flush()
+            ABL.clear(); print("gen", c, flush=True)
+    sys.exit(0)
+
 conds = ["base"] + [f"{t}:{k}" for k in KSET for t in "MWR"] + [f"N:{k}:{j}" for k in KSET for j in range(NNULL)]
 done = set()
 if OUT.exists():
