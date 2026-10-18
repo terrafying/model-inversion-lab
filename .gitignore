@@ -22,3 +22,7 @@ runs/persona-switch/out_*/
 runs/persona-switch/pod_out/
 runs/value-entanglement/gen_*.jsonl
 runs/value-entanglement/*.log
+runs/persona-switch/pod_out/
+runs/persona-switch/satan_out/
+runs/persona-switch/*_smoke/
+runs/persona-switch/reframe_out/

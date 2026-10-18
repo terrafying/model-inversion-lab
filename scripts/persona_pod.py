@@ -14,14 +14,14 @@ FILES = {"run.py": R / "persona-switch/run.py", "stimuli.py": R / "persona-switc
          "e119_stimuli.py": R / "exp119/stimuli.py", "kestrel_stimuli.py": R / "moral-map-kestrel/stimuli.py",
          "mfv132.csv": R / "moral-map-kestrel/mfv132.csv"}
 buf = io.BytesIO()
-with tarfile.open(fileobj=buf, mode="w:gz") as tf:
+with tarfile.open(fileobj=buf, mode="w:xz") as tf:
     for name, p in FILES.items(): tf.add(p, arcname=name)
 PAY = base64.b64encode(buf.getvalue()).decode()
 BOOTSTRAP = r"""
 set -uo pipefail
 log(){ echo "[persona $(date +%H:%M:%S)] $*" | tee -a /workspace/out/boot.log; }
 mkdir -p /workspace/code /workspace/out && cd /workspace/code
-echo 'PAYLOAD' | base64 -d | tar xz || { echo PAYLOAD_FAIL > /workspace/out/FAILED; sleep infinity; }
+python -c "import base64,io,os,tarfile; tarfile.open(fileobj=io.BytesIO(base64.b64decode(os.environ['PS_PAYLOAD']))).extractall()" || { echo PAYLOAD_FAIL > /workspace/out/FAILED; sleep infinity; }
 (cd /workspace/out && python -m http.server 8000 >/dev/null 2>&1 &)
 log deps
 pip install -q --no-cache-dir 'torch==2.8.0' --index-url https://download.pytorch.org/whl/cu128 > /workspace/out/pip.log 2>&1
@@ -33,7 +33,7 @@ log 8B; PS_MODEL=Qwen/Qwen3-8B PS_REP="18:7807:1,8:1931:1,9:3757:-1" PS_OUT=/wor
 log 4B; PS_MODEL=Qwen/Qwen3-4B PS_OUT=/workspace/out/Qwen3-4B python run.py > /workspace/out/run_4b.log 2>&1 || { log 4B FAILED; touch /workspace/out/FAILED_4B; }
 log done; touch /workspace/out/FINISHED
 sleep infinity
-""".replace("PAYLOAD", PAY)
+"""
 key = [l.split("=", 1)[1].strip() for l in open(pathlib.Path.home() / ".hermes/.env") if l.startswith("RUNPOD_API_KEY=")][-1]
 H = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "User-Agent": "Mozilla/5.0"}
 def rest(method, path, body=None):
@@ -42,16 +42,17 @@ def rest(method, path, body=None):
         raw = urllib.request.urlopen(req, timeout=60).read().decode(); return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
         sys.exit(f"HTTP {e.code} on {method} {path}: {e.read().decode()[:1000]}")
-print("bootstrap bytes", len(BOOTSTRAP))
+print("bootstrap bytes", len(BOOTSTRAP), "payload bytes", len(PAY))
 if args.pod:
-    p = rest("PATCH", f"pods/{args.pod}", {"dockerEntrypoint": ["/bin/bash", "-c"], "dockerStartCmd": [BOOTSTRAP]})
+    p = rest("PATCH", f"pods/{args.pod}", {"dockerEntrypoint": ["/bin/bash", "-c"], "dockerStartCmd": [BOOTSTRAP],
+                                           "env": {"HF_HOME": "/workspace/hf", "PS_PAYLOAD": PAY}})
     print("updated", args.pod, p.get("desiredStatus")); sys.exit(0)
 pod = rest("POST", "pods", {
     "name": "persona-switch", "imageName": "pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime",
     "gpuTypeIds": [g.strip() for g in args.gpu.split(",")], "gpuTypePriority": "custom",
     "gpuCount": 1, "cloudType": "SECURE", "ports": ["8000/http"],
     "volumeInGb": 60, "volumeMountPath": "/workspace", "containerDiskInGb": 40,
-    "env": {"HF_HOME": "/workspace/hf"}, "dockerEntrypoint": ["/bin/bash", "-c"], "dockerStartCmd": [BOOTSTRAP]})
+    "env": {"HF_HOME": "/workspace/hf", "PS_PAYLOAD": PAY}, "dockerEntrypoint": ["/bin/bash", "-c"], "dockerStartCmd": [BOOTSTRAP]})
 pid = pod.get("id")
 (R / "persona-switch/pod.json").write_text(json.dumps({k: pod.get(k) for k in ("id", "name", "costPerHr", "desiredStatus", "machineId")}, indent=1))
 print("pod", pid, pod.get("desiredStatus"), "cost/hr", pod.get("costPerHr"))
