@@ -18,3 +18,5 @@ runs/exp107/refusal_harvest.json
 runs/preflight/results/
 runs/value-entanglement/fit_*.npz
 runs/value-entanglement/*_smoke*
+runs/persona-switch/out_*/
+runs/persona-switch/pod_out/
