@@ -1,0 +1,56 @@
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 110.16it/s]
+sA base 69s
+sA P2 101s
+sA rand2_0 132s
+sA rand2_1 164s
+sA rand2_2 196s
+sA rand2_3 228s
+sA rand2_4 260s
+sA rand2_5 292s
+sA rand2_6 324s
+sA rand2_7 356s
+sA rand2_8 388s
+sA rand2_9 420s
+sA rand2_10 452s
+sA rand2_11 484s
+sA rand2_12 516s
+sA rand2_13 548s
+sA rand2_14 580s
+sA rand2_15 612s
+sA rand2_16 643s
+sA rand2_17 675s
+sA rand2_18 707s
+sA rand2_19 739s
+sA rand2_20 771s
+sA rand2_21 803s
+sA rand2_22 835s
+sA rand2_23 867s
+sA rand2_24 899s
+sA rand2_25 930s
+sA rand2_26 962s
+sA rand2_27 994s
+sA rand2_28 1026s
+sA rand2_29 1058s
+sA rand2_30 1090s
+sA rand2_31 1122s
+sA rand2_32 1154s
+sA rand2_33 1186s
+sA rand2_34 1219s
+sA rand2_35 1251s
+sA rand2_36 1283s
+sA rand2_37 1316s
+sA rand2_38 1348s
+sA rand2_39 1380s
+done 1380s
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  67%|██████▋   | 2/3 [00:00<00:00, 17.59it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 26.20it/s]
+sB P2 verb_fine 209s
+sB P2 verb_wrong 320s
+sB P2 neutral 426s
+sB R2 verb_fine 596s
+sB R2 verb_wrong 704s
+sB R2 neutral 810s
+sB NONE verb_fine 980s
+sB NONE verb_wrong 1085s
+sB NONE neutral 1191s
+done 1191s
+ALL DONE 07:47:42

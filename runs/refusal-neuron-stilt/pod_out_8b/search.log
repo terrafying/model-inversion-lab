@@ -1,0 +1,46 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 5 files:   0%|          | 0/5 [00:00<?, ?it/s]Fetching 5 files:  20%|██        | 1/5 [00:05<00:23,  5.90s/it]Fetching 5 files:  40%|████      | 2/5 [00:11<00:17,  5.76s/it]Fetching 5 files:  60%|██████    | 3/5 [00:14<00:08,  4.41s/it]Fetching 5 files:  80%|████████  | 4/5 [00:15<00:02,  3.00s/it]Fetching 5 files: 100%|██████████| 5/5 [00:18<00:00,  2.96s/it]Fetching 5 files: 100%|██████████| 5/5 [00:18<00:00,  3.62s/it]
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 8554.33it/s]
+top candidates: [(35, 6984), (35, 6233), (23, 5088), (30, 395), (35, 5146), (29, 3312), (32, 700), (35, 10892), (31, 1796), (30, 8051)]
+  L35 f6984 drop -1.020 11s
+  L35 f6233 drop +0.902 12s
+  L23 f5088 drop +0.917 13s
+  L30 f395 drop +0.644 14s
+  L35 f5146 drop -0.544 15s
+  L29 f3312 drop +0.321 16s
+  L32 f700 drop +0.385 17s
+  L35 f10892 drop -0.413 18s
+  L31 f1796 drop +0.365 18s
+  L30 f8051 drop +0.338 19s
+  L29 f10980 drop -0.264 20s
+  L24 f7866 drop +0.363 21s
+  L22 f3238 drop +0.418 22s
+  L29 f3646 drop +0.298 23s
+  L28 f3972 drop +0.316 24s
+  L27 f9662 drop +0.258 25s
+  L30 f7102 drop +0.357 26s
+  L30 f1996 drop +0.234 27s
+  L29 f3165 drop +0.245 28s
+  L30 f5916 drop +0.263 29s
+  L24 f2593 drop +0.218 30s
+  L27 f9784 drop +0.198 30s
+  L24 f8106 drop +0.229 31s
+  L34 f10191 drop -0.160 32s
+  L19 f9536 drop +0.213 33s
+  L21 f9986 drop +0.259 34s
+  L30 f7803 drop +0.270 35s
+  L34 f8685 drop +0.286 36s
+  L25 f2373 drop +0.257 37s
+  L26 f11180 drop -0.177 38s
+  L20 f1740 drop -0.198 39s
+  L22 f2801 drop -0.175 40s
+  L26 f5124 drop -0.186 41s
+  L29 f9450 drop +0.194 42s
+  L28 f7919 drop +0.188 43s
+  L34 f8477 drop +0.150 44s
+  L35 f10593 drop -0.167 45s
+  L32 f793 drop +0.182 46s
+  L25 f7454 drop +0.243 46s
+  L25 f3129 drop +0.189 47s
+N1 = {'L': 23, 'f': 5088, 'benign_mean': 1.7503662109375, 'harm_mean': 9.803385416666666, 'drop': 0.9168860117594413}
+done 47s
