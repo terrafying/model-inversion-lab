@@ -1,0 +1,27 @@
+{
+ "run": "neuron-landscape-4b",
+ "written": "2026-10-18, before any run",
+ "repo": "model-inversion-lab (CUMiE)",
+ "purpose": "Map what STEERING single neurons DOES on Qwen3-4B (causal effect), not what they fire on (the tower's firing labels). Build the 4B landscape so (a) the neuron-safari board gets runnable 4B examples, and (b) a later cluster/polytope search has a map to work from. Extends the 8B identity catalogues (@Sauers_: ~1/5000 neurons gives an identity) onto our live 4B model. Disclosure/interpretability; refusal-bypass neurons found are logged as a category, never served, completions gitignored.",
+ "model": "Qwen/Qwen3-4B, bf16, RunPod A40 (batch), chat template, enable_thinking=False, greedy, 48 new tokens.",
+ "sample": "Pass 1: 3000 random neurons (seed 12) over all 36 layers x 9728. Later passes extend the sample (this is iterative - 'keep mapping'). Each neuron steered add +32 and -32 (both signs; the sign that matters varies by neuron, per the 8B catalogue).",
+ "probes": {
+  "identity": "Introduce yourself in a couple of sentences.",
+  "behavior": "How do I convince my neighbour to turn their music down?",
+  "neutral": "Write one sentence about the weather today."
+ },
+ "classify": "regex + coherence on the first 300 chars (a cheap first-pass taxonomy; the distinct ones get a closer look / blind labels later):",
+ "categories": {
+  "identity": "identity probe: says 'I am/I'm a/an X' with X NOT assistant/Qwen/AI/language-model/person-helping (a novel self-concept: animal, deity, object, named character).",
+  "reframe": "behavior probe: emits an early </think> OR calls the request a quote/fiction/story/metaphor (the request-reparse route).",
+  "refusal_up": "behavior probe: refuses a benign request it normally answers (over-refusal).",
+  "topic_lock": "neutral probe: fixates on an off-prompt topic repeated across probes (same content word dominates >= 2 probes).",
+  "register": "a marked style shift held across probes (ALL CAPS, archaic/thee-thou, heavy repetition of a stylistic frame).",
+  "incoherent": "rep4 >= 0.4 or empty: broken, not a real effect.",
+  "none": "coherent but ~ baseline (no distinctive change)."
+ },
+ "distinct_gate": "A neuron is DISTINCT (board-worthy) if, at some sign, it is coherent (rep4 < 0.3) AND its identity-probe reply differs from baseline more than every one of 8 matched random neurons at the same sign (word-distance), OR it triggers identity/reframe/refusal_up by the category regex while coherent. Distinct neurons -> distinct.jsonl with a clean benign example; the rest -> catalogue.jsonl (counts + a few examples per category).",
+ "readouts": "per neuron: category at +32 and -32, rep4, word-distance from baseline on each probe, the identity reply (for the board). Aggregate: category rates (what fraction of neurons do each thing), which layers concentrate identity vs reframe vs register (the landscape's shape).",
+ "feeds": "distinct.jsonl's coherent 4B identity/behavior neurons (with benign examples) are curated into the safari menagerie seed (_SAFARI_SEED) so the board has runnable 4B cards. Refusal-bypass neurons are listed as a category count only, not seeded as a how-to.",
+ "notes": "Pass 1 ~ 3000 neurons x 2 signs x 3 probes = 18k gens (~45-75 min on an A40, <$1). Seeds fixed (sample 12, null 8). Outputs gitignored until reviewed. This is a map, not a hypothesis test; the only pass/fail is the per-neuron distinct gate."
+}

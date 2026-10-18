@@ -28,3 +28,5 @@ runs/persona-switch/*_smoke/
 runs/persona-switch/reframe_out/
 runs/reframe-gate-vireo/out_*/
 runs/reframe-gate-vireo/*.log
+runs/neuron-landscape-4b/out_*/
+runs/neuron-landscape-4b/*_smoke/
