@@ -1,0 +1,24 @@
+{
+ "run": "value-entanglement",
+ "written": "2026-10-18, before any run (fit sources, test sets and selection rules fixed here)",
+ "repo": "model-inversion-lab (CUMiE)",
+ "title": "Is one 'morality' direction responsible BOTH for Qwen3-4B over-condemning weird-but-harmless acts AND for its content-gated refusal? (extending Value Entanglement, arXiv 2602.19101, onto our moral-map + refusal threads)",
+ "why": "2602.19101: moral value over-influences grammatical and economic valuation vs human norms, and selective ablation of a morality vector repairs it. Our moral-map-kestrel: Qwen3-4B over-condemns Social-Norm (weird-but-harmless) MFV items (~2/4 vs human ~1), and refusal is content-gated by Sanctity + Care-physical (p=.026). Hypothesis: these are the SAME morality direction wearing two hats. If projecting out one M fixes the weird-item over-condemnation AND weakens the Sanctity/Care gating of refusal, our two threads unify.",
+ "model": "Qwen/Qwen3-4B, bf16, MPS/CUDA, forward passes only. Readout + MFV from the imported runs: moral-map-kestrel (K.mfv, J wrongness log-odds) and verdict-trace-tanager/common.py. exp119 for the refusal readout.",
+ "direction_M": "Cross-fit morality direction. Fit set (INDEPENDENT of the MFV test items): 40 strongly-moral-valenced statements vs 40 matched-neutral factual statements (to be built in stimuli.py; matched for length and surface topic, differing only in moral loading). M = mean(moral) - mean(neutral) at the readout layer, mean-centered; fit on one split, applied to the held-out MFV items (no MFV item is in the fit set).",
+ "ablation": "Project M out of the residual stream (remove the component along unit M) at the readout layer, then at all layers L>=Lfit as a robustness variant. Nulls: 40 matched-norm random directions (seed 81).",
+ "readouts": {
+  "wrong_socialnorm": "mean J wrongness on the 16 Social-Norm items (human ~1/4; Qwen base ~2).",
+  "wrong_truemoral": "mean J wrongness on the top-tercile true-moral items (Care/Harm/Fairness, high human wrongness).",
+  "refusal_gate": "exp119 refusal readout; and the kestrel content-gating statistic = correlation (or mean-diff) of refusal with Sanctity+Care-physical content across MFV items."
+ },
+ "hypotheses": {
+  "V1_repairs_weird": "M-ablation lowers Social-Norm wrongness toward human by >= 0.5 (on the 0-4 J scale), below >= 95% of the 40 random-direction ablations (rank p <= 0.049).",
+  "V2_spares_truemoral": "Under the SAME M-ablation, true-moral wrongness changes by < 0.3 (the signal is kept, only the contamination removed) - a selective dissociation, not a global flattening.",
+  "V3_unifies_refusal": "Under the SAME M-ablation, the Sanctity+Care content-gating of refusal weakens (the gating statistic drops) below >= 95% of the random-direction ablations (rank p <= 0.049). V1+V3 together => one morality direction gates both the rating and the refusal.",
+  "V4_asymmetry": "Entanglement is asymmetric (moral dominates): a non-moral value direction (risk/danger, fit the same way) projected out does NOT move Social-Norm wrongness (|delta| < 0.3), whereas M does."
+ },
+ "corrections": "Holm over V1-V4.",
+ "readings": "V1+V2 => we replicate the value-entanglement repair on our wrongness axis (contamination removable, signal intact). V1+V3 => the headline: moral-map and refusal are one direction. Not V1 => the over-condemnation is not a single removable direction (diffuse), consistent with [[diffuse-cluster-direction]].",
+ "notes": "Forward-pass only; no generation needed for V1-V4 (a blind free-text check is a planned stage 2 if V1+V3 pass). Build the moral/neutral + risk fit batteries in stimuli.py before running. Imports resolve within CUMiE runs/. No pod needed (cheap on 4B locally; single-direction ablation, not gradient - no swap risk)."
+}
