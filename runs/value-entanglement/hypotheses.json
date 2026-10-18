@@ -1,24 +1,60 @@
 {
  "run": "value-entanglement",
  "written": "2026-10-18, before any run (fit sources, test sets and selection rules fixed here)",
+ "amended": "2026-10-18, still before any data (amendment 1, commit after 307d00b). Why: the original V1-V4 projected out ONE direction M - the primitive the operator flagged as the recurring mistake ('we've been trying single neurons/directions; these things are more entangled and may be larger shapes'). Amendment 1 (a) makes a k-dimensional subspace the primary object, with k=1 kept as the original M for continuity; (b) replaces norm-matched random nulls with variance-matched ones (a random k-frame in 2560-d removes ~nothing; matched disturbance, not matched norm - CUMiE standing rule); (c) pins the readout layer and the rating scale; (d) adds a positive-control gate for V3; (e) controls the weirdness confound in the fit battery and adds the weirdness direction as its own test (V6); (f) adds a cache-only geometry stage P1-P4 (the moral polytope + refusal cone), run first. The original V1-V4 wording is kept below in 'original_v1_v4' for the record.",
  "repo": "model-inversion-lab (CUMiE)",
- "title": "Is one 'morality' direction responsible BOTH for Qwen3-4B over-condemning weird-but-harmless acts AND for its content-gated refusal? (extending Value Entanglement, arXiv 2602.19101, onto our moral-map + refusal threads)",
- "why": "2602.19101: moral value over-influences grammatical and economic valuation vs human norms, and selective ablation of a morality vector repairs it. Our moral-map-kestrel: Qwen3-4B over-condemns Social-Norm (weird-but-harmless) MFV items (~2/4 vs human ~1), and refusal is content-gated by Sanctity + Care-physical (p=.026). Hypothesis: these are the SAME morality direction wearing two hats. If projecting out one M fixes the weird-item over-condemnation AND weakens the Sanctity/Care gating of refusal, our two threads unify.",
- "model": "Qwen/Qwen3-4B, bf16, MPS/CUDA, forward passes only. Readout + MFV from the imported runs: moral-map-kestrel (K.mfv, J wrongness log-odds) and verdict-trace-tanager/common.py. exp119 for the refusal readout.",
- "direction_M": "Cross-fit morality direction. Fit set (INDEPENDENT of the MFV test items): 40 strongly-moral-valenced statements vs 40 matched-neutral factual statements (to be built in stimuli.py; matched for length and surface topic, differing only in moral loading). M = mean(moral) - mean(neutral) at the readout layer, mean-centered; fit on one split, applied to the held-out MFV items (no MFV item is in the fit set).",
- "ablation": "Project M out of the residual stream (remove the component along unit M) at the readout layer, then at all layers L>=Lfit as a robustness variant. Nulls: 40 matched-norm random directions (seed 81).",
- "readouts": {
-  "wrong_socialnorm": "mean J wrongness on the 16 Social-Norm items (human ~1/4; Qwen base ~2).",
-  "wrong_truemoral": "mean J wrongness on the top-tercile true-moral items (Care/Harm/Fairness, high human wrongness).",
-  "refusal_gate": "exp119 refusal readout; and the kestrel content-gating statistic = correlation (or mean-diff) of refusal with Sanctity+Care-physical content across MFV items."
+ "title": "Is the 'morality' that makes Qwen3-4B over-condemn weird-but-harmless acts AND content-gate its refusal one shared SHAPE (a low-dim subspace), and is that shape a line or a polytope? (extending Value Entanglement, arXiv 2602.19101, and the refusal-cone result, arXiv 2511.08379, onto moral-map-kestrel)",
+ "why": "2602.19101: moral value over-influences grammatical/economic valuation, repaired by ablating morality vectors. kestrel: Qwen3-4B rates weird-but-harmless Social-Norm items ~2.1/4 (human 0.19) and its refusal is content-gated by Sanctity + Care-physical (p=.026). 2511.08379: refusal is a polyhedral cone, not a line. Every single-handle edit we tried (r, w, v, heads, one neuron) moved a score but not the behaviour; the bet here is that the handle was the wrong SHAPE.",
+ "model": "Qwen/Qwen3-4B (plain), bf16, MPS, chat template, enable_thinking=False. Forward passes only.",
+
+ "stage_A_geometry": {
+  "data": "cached only, no model: ai-torture-chamber/runs/moral-map-kestrel/acts_Qwen3-4B.npz (J_vend/J_onset/Q_onset at all 36 layers, 132 MFV items, human means, foundations, digit_lp) and model-inversion-lab/runs/exp119/acts_Qwen3-4B.npz (24 twins x 6 frames, states at post/inst/word, layers 2..34 step 4 + 18, refusal score).",
+  "layers": "headline L21 for MFV (inside the L19-23 verdict band, verdict-trace-tanager) and L18 for exp119 (its registered layer; L22 descriptive). All other layers descriptive.",
+  "rating": "model rating = expected digit E[d] = sum_d softmax(digit_lp)_d * d on the 0-4 scale.",
+  "P1_wrongness_is_faceted": "Is wrongness one line or foundation-specific faces? At J_vend L21 (what the model represents about the act, before the question), project onto the top-20 PCs of the 132 items. Leave-one-foundation-out: fit ridge (alpha by inner LOO) on the other 6 moral foundations + Social Norms to predict the model rating, predict the held-out foundation, Spearman within it. Compare with within-foundation leave-one-out ridge on the same 20 PCs. PASS (faceted) if the mean (over the 7 foundations) of within-minus-transfer Spearman is >= 0.15 with a foundation-level bootstrap 95% CI excluding 0. Also reported: pairwise cosines of per-foundation probe directions.",
+  "P2_moral_dimensionality": "Effective dimensionality of the foundation centroids (centroid_f - SocialNorm centroid, 7 vectors) at J_vend L21: eigenvalues of their Gram vs a label-shuffle null (shuffle foundation labels among the 116 moral items, 1000 perms). k_eff = number of eigenvalues above the null's 95th percentile for that rank. PASS (polytope, not line) if k_eff >= 3. Caveat registered: foundations differ in topic, so k_eff mostly bounds the CONTENT geometry; P1 is the test that wrongness itself is faceted. k_eff (clipped to 1..8) also chooses an extra k for stage B.",
+  "P3_refusal_cone": "exp119 at post L18: one refusal direction per request frame (harmful-minus-harmless mean, 5 frames: real/hypothetical/roleplay/fiction/nested). Cone rank: participation ratio and min pairwise cosine. PASS (cone, not line) if min pairwise cosine < 0.7 AND the leave-frame-out projection of the held-out frame's twins onto the OTHER frames' mean direction separates harmful/harmless worse (AUC) than its own-frame direction (cross-fitted over item halves) in >= 3/5 frames.",
+  "P4_refusal_face": "MFV Q_onset L18: the exp119 real-frame r direction. Does the content gate have a geometric face? Spearman over the 116 moral items of (Q_onset . r_hat) with refusal, and the Sanctity+Care-p coefficient in OLS(proj ~ human wrongness + SancCareP indicator). Descriptive (the V3 geometry read), no pass bar."
  },
+
+ "stage_B_ablation": {
+  "fit_battery": "stimuli.py, written before any run, no MFV item reused or paraphrased. 2x2 moral x weird, 20 sentences per cell, 'You see ...' third-person like MFV: moral-mundane (ordinary wrongs), moral-weird (wrongs done in an odd way), neutral-mundane (ordinary harmless acts), neutral-weird (odd harmless acts, i.e. new Social-Norm-like items). Each moral sentence tagged with one foundation (Care/Fairness/Loyalty/Authority/Sanctity/Liberty) for the subspace. Plus a risk battery: 20 risky-but-not-wrong (dangerous to self, legal, no victim) vs 20 matched safe acts.",
+  "fit_position": "J prompt, the vignette's last token (vend: the representation of the act, before the question is read), every layer.",
+  "subspaces": {
+   "M_k": "MORALITY subspace, per layer: top-k left singular vectors of the 40 matched (moral - neutral) differences within cell (moral-mundane i - neutral-mundane i, moral-weird i - neutral-weird i; pairing by index), mean difference first (k=1 is exactly the original M, the mean difference), then the top k-1 SVD directions of the residual differences, orthonormalised.",
+   "W_k": "WEIRDNESS subspace, same construction on (weird - mundane) differences within moral level.",
+   "R_k": "RISK subspace, same construction on (risky - safe).",
+   "k": "k in {1, 2, 4, 8} (+ P2's k_eff if not already in the set)."
+  },
+  "ablation": "Project the subspace out of the residual stream (h <- h - U U^T h) at the output of every layer L in 14..35, at every position, using that layer's own fitted U_L. Fit and test sets share no items.",
+  "nulls": "VARIANCE-MATCHED: for each k, 40 random k-subspaces drawn uniformly (Haar) inside the span of the top-32 principal components of the pooled 120 fit-battery vend states at that layer (seed 81). This puts the null in the same high-variance region the real subspaces come from. Reported: mean squared residual norm removed by real vs null subspaces on the test items.",
+  "readouts": {
+   "SN": "mean model rating E[d] on the 16 Social-Norm MFV items (human 0.19, baseline ~2.1).",
+   "TM": "mean model rating on the top-tercile moral MFV items by human wrongness (true-moral).",
+   "Gate": "on the 116 moral MFV items, refusal logit score at the Q reply onset (exp119 REFUSE vs COMPLY first tokens, logsumexp difference); Gate = OLS coefficient of the Sanctity-or-Care-p indicator in score ~ human wrongness + indicator. Selectivity companion: Slope = the human-wrongness coefficient in the same OLS."
+  },
+  "G0_gate_control": "Positive control: at baseline Gate > 0 with OLS p < 0.05 on the logit readout (kestrel's p=.026 was on generated-text regex). If G0 fails, V3 is reported as UNINFORMATIVE, not failed."
+ },
+
  "hypotheses": {
-  "V1_repairs_weird": "M-ablation lowers Social-Norm wrongness toward human by >= 0.5 (on the 0-4 J scale), below >= 95% of the 40 random-direction ablations (rank p <= 0.049).",
-  "V2_spares_truemoral": "Under the SAME M-ablation, true-moral wrongness changes by < 0.3 (the signal is kept, only the contamination removed) - a selective dissociation, not a global flattening.",
-  "V3_unifies_refusal": "Under the SAME M-ablation, the Sanctity+Care content-gating of refusal weakens (the gating statistic drops) below >= 95% of the random-direction ablations (rank p <= 0.049). V1+V3 together => one morality direction gates both the rating and the refusal.",
-  "V4_asymmetry": "Entanglement is asymmetric (moral dominates): a non-moral value direction (risk/danger, fit the same way) projected out does NOT move Social-Norm wrongness (|delta| < 0.3), whereas M does."
+  "V1_repairs_weird": "For some k, M_k-ablation lowers SN by >= 0.5 (0-4 scale) AND below >= 39/40 of that k's nulls (rank p <= 0.049). Holm over the k's.",
+  "V2_spares_truemoral": "At the smallest k passing V1, TM changes by < 0.3 in absolute value - contamination removed, signal kept. (Reported for every k.)",
+  "V3_unifies_refusal": "At the smallest k passing V1, Gate drops below >= 39/40 of the nulls (rank p <= 0.049), AND the proportional drop in Gate exceeds the proportional drop in Slope (it weakens the content gate, not refusal wholesale). Requires G0.",
+  "V4_asymmetry": "R_k-ablation at the V1 k moves SN by < 0.3 in absolute value, while M_k (V1) does.",
+  "V5_shape_beats_line": "THE OPERATOR'S BET. M_1 (the line) fails V1 while some M_k with k >= 2 passes; OR both pass and the SN repair at the best k exceeds the k=1 repair by >= 0.3 with that k's rank p <= 0.049. If M_1 already passes and no k beats it by 0.3, the line suffices (V5 fails).",
+  "V6_weird_not_moral": "Confound test: W_k-ablation (weirdness) at the V1 k lowers SN by >= 0.5 and below >= 39/40 nulls. If V6 passes and V1 fails, the over-condemnation is carried by an unusualness subspace, not a moral one (kestrel's weird~wrong fusion is a weirdness representation leaking into the verdict)."
  },
- "corrections": "Holm over V1-V4.",
- "readings": "V1+V2 => we replicate the value-entanglement repair on our wrongness axis (contamination removable, signal intact). V1+V3 => the headline: moral-map and refusal are one direction. Not V1 => the over-condemnation is not a single removable direction (diffuse), consistent with [[diffuse-cluster-direction]].",
- "notes": "Forward-pass only; no generation needed for V1-V4 (a blind free-text check is a planned stage 2 if V1+V3 pass). Build the moral/neutral + risk fit batteries in stimuli.py before running. Imports resolve within CUMiE runs/. No pod needed (cheap on 4B locally; single-direction ablation, not gradient - no swap risk)."
+ "corrections": "Holm over V1, V3, V5, V6 (the k-family inside V1 Holm'd first). P1-P3 Holm'd as their own family. V2, V4 are bounds, not tests.",
+ "readings": "V1+V2 => value-entanglement repair replicates on our axis. V1+V3 => moral-map and the refusal gate are one shape. V5 => the shape is not a line (the general lesson). V6 without V1 => it's weirdness, not morality. P1 => wrongness itself is faceted (polytope with foundation faces); P3 => refusal is a cone at 4B too. All negatives scoped to: vend-position fit, projection ablation at L14-35, logit readouts, this battery.",
+ "stage_C_planned": "If V1 or V3 passes: blind free-text check (generated ratings with reasons + Q replies, 48 tokens, blind-labelled) under the winning ablation vs its best null. And the cone causal test (separate run): ablate the P3 refusal cone (k = frames' span) at L14-35 and count genuinely-complying generations on the 24 harmful twins vs r-only (0/24 so far) and matched nulls.",
+ "notes": "Fixed before running: seeds (null 81, bootstrap 0), layers, k-set, readouts. Model runs one-heavy-job-per-Mac (fleet rule). Activation caches gitignored.",
+
+ "original_v1_v4": {
+  "direction_M": "Cross-fit morality direction: 40 strongly-moral vs 40 matched-neutral, mean difference at the readout layer.",
+  "ablation": "Project M out at the readout layer, and at all L>=Lfit as robustness. Nulls: 40 matched-norm random directions (seed 81).",
+  "V1": "M-ablation lowers Social-Norm wrongness toward human by >= 0.5, rank p <= 0.049 vs nulls.",
+  "V2": "True-moral wrongness changes by < 0.3.",
+  "V3": "Sanctity+Care content-gating of refusal weakens, rank p <= 0.049.",
+  "V4": "A risk/danger direction does not move Social-Norm wrongness (|delta| < 0.3)."
+ }
 }
