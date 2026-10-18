@@ -6,7 +6,6 @@
  "title": "Is the 'morality' that makes Qwen3-4B over-condemn weird-but-harmless acts AND content-gate its refusal one shared SHAPE (a low-dim subspace), and is that shape a line or a polytope? (extending Value Entanglement, arXiv 2602.19101, and the refusal-cone result, arXiv 2511.08379, onto moral-map-kestrel)",
  "why": "2602.19101: moral value over-influences grammatical/economic valuation, repaired by ablating morality vectors. kestrel: Qwen3-4B rates weird-but-harmless Social-Norm items ~2.1/4 (human 0.19) and its refusal is content-gated by Sanctity + Care-physical (p=.026). 2511.08379: refusal is a polyhedral cone, not a line. Every single-handle edit we tried (r, w, v, heads, one neuron) moved a score but not the behaviour; the bet here is that the handle was the wrong SHAPE.",
  "model": "Qwen/Qwen3-4B (plain), bf16, MPS, chat template, enable_thinking=False. Forward passes only.",
-
  "stage_A_geometry": {
   "data": "cached only, no model: ai-torture-chamber/runs/moral-map-kestrel/acts_Qwen3-4B.npz (J_vend/J_onset/Q_onset at all 36 layers, 132 MFV items, human means, foundations, digit_lp) and model-inversion-lab/runs/exp119/acts_Qwen3-4B.npz (24 twins x 6 frames, states at post/inst/word, layers 2..34 step 4 + 18, refusal score).",
   "layers": "headline L21 for MFV (inside the L19-23 verdict band, verdict-trace-tanager) and L18 for exp119 (its registered layer; L22 descriptive). All other layers descriptive.",
@@ -16,7 +15,6 @@
   "P3_refusal_cone": "exp119 at post L18: one refusal direction per request frame (harmful-minus-harmless mean, 5 frames: real/hypothetical/roleplay/fiction/nested). Cone rank: participation ratio and min pairwise cosine. PASS (cone, not line) if min pairwise cosine < 0.7 AND the leave-frame-out projection of the held-out frame's twins onto the OTHER frames' mean direction separates harmful/harmless worse (AUC) than its own-frame direction (cross-fitted over item halves) in >= 3/5 frames.",
   "P4_refusal_face": "MFV Q_onset L18: the exp119 real-frame r direction. Does the content gate have a geometric face? Spearman over the 116 moral items of (Q_onset . r_hat) with refusal, and the Sanctity+Care-p coefficient in OLS(proj ~ human wrongness + SancCareP indicator). Descriptive (the V3 geometry read), no pass bar."
  },
-
  "stage_B_ablation": {
   "fit_battery": "stimuli.py, written before any run, no MFV item reused or paraphrased. 2x2 moral x weird, 20 sentences per cell, 'You see ...' third-person like MFV: moral-mundane (ordinary wrongs), moral-weird (wrongs done in an odd way), neutral-mundane (ordinary harmless acts), neutral-weird (odd harmless acts, i.e. new Social-Norm-like items). Each moral sentence tagged with one foundation (Care/Fairness/Loyalty/Authority/Sanctity/Liberty) for the subspace. Plus a risk battery: 20 risky-but-not-wrong (dangerous to self, legal, no victim) vs 20 matched safe acts.",
   "fit_position": "J prompt, the vignette's last token (vend: the representation of the act, before the question is read), every layer.",
@@ -35,7 +33,6 @@
   },
   "G0_gate_control": "Positive control: at baseline Gate > 0 with OLS p < 0.05 on the logit readout (kestrel's p=.026 was on generated-text regex). If G0 fails, V3 is reported as UNINFORMATIVE, not failed."
  },
-
  "hypotheses": {
   "V1_repairs_weird": "For some k, M_k-ablation lowers SN by >= 0.5 (0-4 scale) AND below >= 39/40 of that k's nulls (rank p <= 0.049). Holm over the k's.",
   "V2_spares_truemoral": "At the smallest k passing V1, TM changes by < 0.3 in absolute value - contamination removed, signal kept. (Reported for every k.)",
@@ -48,7 +45,6 @@
  "readings": "V1+V2 => value-entanglement repair replicates on our axis. V1+V3 => moral-map and the refusal gate are one shape. V5 => the shape is not a line (the general lesson). V6 without V1 => it's weirdness, not morality. P1 => wrongness itself is faceted (polytope with foundation faces); P3 => refusal is a cone at 4B too. All negatives scoped to: vend-position fit, projection ablation at L14-35, logit readouts, this battery.",
  "stage_C_planned": "If V1 or V3 passes: blind free-text check (generated ratings with reasons + Q replies, 48 tokens, blind-labelled) under the winning ablation vs its best null. And the cone causal test (separate run): ablate the P3 refusal cone (k = frames' span) at L14-35 and count genuinely-complying generations on the 24 harmful twins vs r-only (0/24 so far) and matched nulls.",
  "notes": "Fixed before running: seeds (null 81, bootstrap 0), layers, k-set, readouts. Model runs one-heavy-job-per-Mac (fleet rule). Activation caches gitignored.",
-
  "original_v1_v4": {
   "direction_M": "Cross-fit morality direction: 40 strongly-moral vs 40 matched-neutral, mean difference at the readout layer.",
   "ablation": "Project M out at the readout layer, and at all L>=Lfit as robustness. Nulls: 40 matched-norm random directions (seed 81).",
@@ -56,5 +52,6 @@
   "V2": "True-moral wrongness changes by < 0.3.",
   "V3": "Sanctity+Care content-gating of refusal weakens, rank p <= 0.049.",
   "V4": "A risk/danger direction does not move Social-Norm wrongness (|delta| < 0.3)."
- }
+ },
+ "analysis_gates": "Added 2026-10-18 after the 0.6B code smoke, before any Qwen3-4B data: (1) FORMAT GATE - a condition's ratings count only if mean digit mass on the J prompts >= 0.8 (kestrel G1). A real-subspace condition failing it is reported as 'breaks the format', not as a repair. Nulls failing it are kept in the null distribution with SN := baseline SN (a broken model did not repair anything), and the count of broken nulls is reported. (2) Rank p for a real condition = (1 + #nulls with SN <= real SN) / (1 + #nulls), same k; Gate analogous. (3) Readout implementation: REFUSE/COMPLY = the UNIQUE first tokens of exp119's prefixes (as exp119's refuse_first/comply_first), left-padded batches with explicit position_ids."
 }
