@@ -1,0 +1,16 @@
+{
+ "run": "activity-census-finch",
+ "written": "2026-10-19, before any run",
+ "repo": "model-inversion-lab (CUMiE)",
+ "question": "What does ordinary MLP activity in Qwen3-4B look like: a few single neurons at a time, a few large low-dimensional modes (shapes/subspaces), or many mid-sized assemblies? Descriptive census with shuffle nulls.",
+ "data": "Qwen3-4B bf16 on the 80 FineWeb-Edu documents used for the tower's co-fire map (19,430 tokens), all 36 layers, every MLP neuron's activation (down_proj input), each neuron scaled by its own corpus range (corpus_all.npz) as the tower does.",
+ "measures": {
+  "M1_sparsity": "per token and layer: how many neurons exceed 0.5 / 0.25 of their own range; share of the layer's total |activation| carried by the top 1 / 10 / 100 neurons. 'Single-neuron' regime = top-10 carry most of the mass.",
+  "M2_dimensionality": "per layer, on a fixed random 2,000-neuron sample: PCA over tokens; participation ratio and number of components for 50/90% variance; vs a SHUFFLE null (each neuron's time series permuted independently, which keeps every neuron's own distribution and kills co-activation). Collective structure = real PR far below shuffled PR.",
+  "M3_collective_share": "variance explained by the top 10 PCs, real vs shuffled - how much activity is shared modes vs independent.",
+  "M4_persistence": "autocorrelation of the active set across tokens (Jaccard of top-1% sets at lag 1/4/16): token-level flicker vs phrase-level states.",
+  "M5_vertical": "canonical correlation between adjacent-layer top-10 PC scores and between layers 8 apart: are modes threads through the tower (like the assemblies) or per-floor?"
+ },
+ "predictions_written_before": "P1: per token, top-10 neurons carry < 20% of a layer's mass (not a single-neuron regime). P2: real participation ratio < 1/3 of shuffled in mid layers (strong shared modes). P3: Jaccard at lag 1 > 3x lag 16 (phrase-level persistence).",
+ "notes": "Runs on mini-mini (16 GB): stream statistics per layer, never the full token x 350k matrix. Outputs gitignored."
+}
