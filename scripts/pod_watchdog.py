@@ -8,7 +8,7 @@ U = f"https://{pid}-8000.proxy.runpod.net/"
 key = [l.split("=", 1)[1].strip() for l in open(pathlib.Path.home() / ".hermes/.env") if l.startswith("RUNPOD_API_KEY=")][-1]
 def get(p, head=False):
     try:
-        r = urllib.request.urlopen(urllib.request.Request(U + p, method="HEAD" if head else "GET"), timeout=60)
+        r = urllib.request.urlopen(urllib.request.Request(U + p, method="HEAD" if head else "GET", headers={"User-Agent": "Mozilla/5.0"}), timeout=60)
         return r if head else r.read()
     except Exception: return None
 def progress():

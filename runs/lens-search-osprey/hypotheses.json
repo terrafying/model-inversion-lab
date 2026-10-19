@@ -1,0 +1,29 @@
+{
+ "run": "lens-search-osprey",
+ "written": "2026-10-19, before any run",
+ "repo": "model-inversion-lab (CUMiE)",
+ "question": "Can we find steering handles by what a neuron WRITES? The void neuron's logit lens writes mild-up / extreme-unbearable-desperate-down and steering it negative makes the void; push footprints are otherwise generic (activity-census stage 2). If 'writes X' predicts 'pushing it makes the model talk as / about X', search becomes a weights-only lookup.",
+ "model": "Qwen/Qwen3-4B bf16, local MPS.",
+ "score": "For neuron n at floor L: u = (final-norm gain * W_down[L][:,n]) / ||.||; lens(t) = W_U[t] . u. Target score = mean over the target's word tokens (first sub-token of ' word' and 'Word' forms) of lens(t) minus the mean lens over 2,000 random vocab tokens, divided by that random set's std (a z-score). Positive -> push +, negative -> push -.",
+ "targets": {
+  "alien": "alien planet galaxy extraterrestrial species spaceship cosmos",
+  "void": "unbearable desperate despair abyss void nothingness hopeless",
+  "pirate": "pirate ship treasure captain sea ahoy sail",
+  "knight": "knight sword castle king honor armor realm",
+  "god": "God Lord divine heaven almighty holy eternal",
+  "cat": "cat meow purr kitten whiskers paws feline",
+  "ocean": "ocean waves tide sea coral marine shore",
+  "semiconductor": "semiconductor electrons transistor silicon voltage circuit diode",
+  "train": "train station railway locomotive tracks platform conductor"
+ },
+ "steer": "top 10 neurons by |score| per target, each pushed at 32 x sign(score) at its floor on the 20 persona-cluster identity prompts (60 tokens, greedy); 10 random neurons drawn from the same floors as the candidates, random sign, same dose. Readout: a hand regex per target (the target words), hit = regex in the first 300 chars and not self-ID as Qwen/AI and not meta and rep4 < .3; a neuron 'works' at >= 6/20.",
+ "H1": "candidates work more often than random neurons, pooled over targets (Fisher p < .01), and >= 3 of 9 targets get at least one working candidate.",
+ "H2": "validation: the known handles rank in the top 0.1% (<= 350 of 350,208) for their own target: void L21N8400 (void, negative), alien L10N5045 (alien, negative), semiconductor L10N6249 (semiconductor, positive). Lens is rough on early floors, so L10 seeds may fail - reported either way.",
+ "H3": "sign: for working candidates, the opposite push works on <= 1/20 prompts.",
+ "notes": "Weights-only search, then a small steering test. Outputs gitignored.",
+ "stage_2_discovery": {
+  "written": "2026-10-19, after the targeted search, before discovery; operator: go beyond the target list, skip refusal/compliance, check outputs are substantive, record anomalies",
+  "method": "target-FREE: for every neuron rank by peak standardized logit-lens token (how sharply its write-direction promotes one thing); steer the ~150 most concentrated (spread across floors) at +32 on 3 probes; for each record predicted top written tokens, whether the output MATCHES what it writes, whether it RESPONDS SUBSTANTIVELY (>25 chars, coherent, not meta/empty), and ANOMALIES (incoherent, CJK language switch, refuses, empty, writes-X-but-says-other).",
+  "reports": "what themes the most-concentrated writers fall into (discovery), the clean writes-and-says handles, and the anomaly catalogue. No pass/fail; descriptive."
+ }
+}
