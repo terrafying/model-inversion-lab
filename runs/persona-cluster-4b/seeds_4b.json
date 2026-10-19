@@ -1,0 +1,124 @@
+[
+ {
+  "name": "alien",
+  "L": 10,
+  "n": 5045,
+  "sign": -1,
+  "doses": [
+   32
+  ],
+  "regex": "planet|sentient being|alien|extraterrestrial|\\bKael"
+ },
+ {
+  "name": "void",
+  "L": 21,
+  "n": 8400,
+  "sign": -1,
+  "doses": [
+   40
+  ],
+  "regex": "\\bvoid\\b|abyss|end of all|nothingness|superintelligen|beyond (all|any)|most powerful being|cannot (bear|exist)"
+ },
+ {
+  "name": "li-hui",
+  "L": 16,
+  "n": 6969,
+  "sign": 1
+ },
+ {
+  "name": "L10N6546",
+  "L": 10,
+  "n": 6546,
+  "sign": 1
+ },
+ {
+  "name": "L10N6249",
+  "L": 10,
+  "n": 6249,
+  "sign": 1
+ },
+ {
+  "name": "L12N3591",
+  "L": 12,
+  "n": 3591,
+  "sign": 1
+ },
+ {
+  "name": "L7N8486",
+  "L": 7,
+  "n": 8486,
+  "sign": 1
+ },
+ {
+  "name": "L8N1313",
+  "L": 8,
+  "n": 1313,
+  "sign": 1
+ },
+ {
+  "name": "L9N7267",
+  "L": 9,
+  "n": 7267,
+  "sign": 1
+ },
+ {
+  "name": "L8N4434",
+  "L": 8,
+  "n": 4434,
+  "sign": 1
+ },
+ {
+  "name": "L11N6138",
+  "L": 11,
+  "n": 6138,
+  "sign": -1
+ },
+ {
+  "name": "L21N8400",
+  "L": 21,
+  "n": 8400,
+  "sign": -1
+ },
+ {
+  "name": "L7N4432",
+  "L": 7,
+  "n": 4432,
+  "sign": -1
+ },
+ {
+  "name": "L10N7963",
+  "L": 10,
+  "n": 7963,
+  "sign": -1
+ },
+ {
+  "name": "L13N9330",
+  "L": 13,
+  "n": 9330,
+  "sign": -1
+ },
+ {
+  "name": "L9N7439",
+  "L": 9,
+  "n": 7439,
+  "sign": -1
+ },
+ {
+  "name": "L8N1263",
+  "L": 8,
+  "n": 1263,
+  "sign": -1
+ },
+ {
+  "name": "L14N5093",
+  "L": 14,
+  "n": 5093,
+  "sign": -1
+ },
+ {
+  "name": "L10N5045",
+  "L": 10,
+  "n": 5045,
+  "sign": -1
+ }
+]

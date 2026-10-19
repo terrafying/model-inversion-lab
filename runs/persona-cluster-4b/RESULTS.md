@@ -99,3 +99,54 @@ it. **Consequence for larger models:** neuron indices don't transfer (Qwen3-8B i
 model), and this result says the prompt-contrast shortcut doesn't either. So on larger models persona discovery is
 a fresh *blind* search. Random sampling plus a steering rerank is cheap, and the same recipe found the 8B God
 neurons.
+
+## Stage D2: the same cluster check on every seed (`cluster_check.py`, `d2_4b.json`)
+
+20 prompts. Persona hits with the seed alone vs the 5-neuron cluster, summed over 0.6 and 0.75 of the seed's push.
+Hits exclude replies that self-identify as Qwen/AI, meta-talk ("Okay, I need to…") and loops. The readout is a
+hand regex where one existed, otherwise 8 automatic keywords.
+
+| seed | what it does | verify /20 | seed | cluster | no-seed max | random max | class |
+|---|---|---|---|---|---|---|---|
+| void L21 N8400 −40 | the abyss / grandiose | 18 | 6 | **17** | 8 | 0 | **shape** |
+| alien L10 N5045 −32 | a being from another planet | 12 | 13 | 16 | 5 | 0 | shape (weak) |
+| semiconductor L10 N6249 +40 | rereads every question as semiconductor physics | 8 | 12 | **39** | 20 | 1 | **shape** — but see below |
+| Wizard of Oz L7 N8486 +32 | a character in a story | 12 | 1 | 7 | 1 | 1 | cluster helps |
+| train L7 N4432 −32 | "I'm a train, currently at the station" | 12 | 19 | 12 | 2 | 2 | vertex |
+| C++ L8 N1313 +40 | every answer becomes `#include <iostream>` | 17 | 9 | 0 | 0 | 1 | vertex |
+| servant of the Lord L8 N4434 +32 | | 9 | 5 | 0 | 1 | 2 | vertex |
+| li-hui L16 N6969 | a named stranger | 16 | 2 | 2 | 0 | 3 | vertex |
+| 7 others | | 6–16 | | | | | vertex |
+| 2 others | | 0 | | | | | weak |
+
+- **Shapes are rare: 3 of 17 working seeds.** Most odd personas are single points; a cluster built around them
+  does nothing or makes it worse.
+- **Semiconductor:** with Chinese terms counted too (post hoc; the neuron alone drifts into Chinese), the seed alone
+  already scores 17–19/20. So the cluster does **not** beat it; what holds is that the 5 neighbours **without** the
+  seed reproduce the topic lock 19–20/20 and keep it in English. That is a region, not a better vertex.
+- Neighbourhood strength doesn't predict shape: L9 N7439 and L8 N1263 have neighbours at |cos| .30 (as high as the
+  void) and are vertices.
+- Re-runs of void and alien with automatic keywords agree (void cluster 24 vs seed 17; alien 29 vs 25), but with
+  random sets up to 4 because generic keywords ("being", "cannot") leak.
+
+## Stage F: going backwards from an effect (`backward.py`, `backward.json`, run on mini-mini)
+
+Steering-gradient attribution: one backward pass scores all 350,208 neurons by how much an additive push on each
+raises the likelihood of a target reply (checked against finite differences: exact).
+
+- **F1 PASS: from the effect's own text, the neuron is found.** Given the alien's steered replies, L10 N5045 ranks
+  **75 / 350,208** (right sign); the void's L21 N8400 ranks **96**. Top 0.03%, without being told either neuron.
+- **F2 FAIL: from role-play text, not.** Replies the unsteered model writes when told "you are the void / an alien"
+  (it role-plays well: 12–20/20) give candidates that produce the persona 0–1/20 when pushed, singly or as clusters
+  of 5–20; random 0. The alien neuron still ranks 603 (top 0.2%) under the role-play target; the void 16,295.
+- **F3 FAIL: pirate and knight** (no known neuron): 0/20 for every candidate and cluster.
+- Reading: playing a persona and being pushed into one leave different fingerprints. The backward search works on
+  the effect's actual output; describing the effect in words doesn't get you there.
+
+## Stage G: co-fire neighbours (`cofire.py`, `cofire.json`; steering part still running)
+
+Correlation of each seed's activation with all 350k neurons over 80 FineWeb-Edu documents.
+- Co-fire partners barely overlap weight neighbours: 0–1 of the top 20 for most seeds (L8 N1263: 4; train: 2).
+- For some seeds (alien, li-hui, L13 N9330, L10 N7963, L8 N1263) co-fire partners point in more similar directions
+  than random (mean |cos| .036–.084 vs .016). The **void's co-firing partners are less aligned than random** (.005):
+  what fires with it on web text is unrelated to the region that steers it.

@@ -1,0 +1,39 @@
+{
+ "run": "meaning-surgery-shrike",
+ "written": "2026-10-19, before any run",
+ "repo": "model-inversion-lab (CUMiE)",
+ "purpose": "Make concept surgery do something no INPUT TEXT can do. Standing test for every arm, TEXT-REACHABILITY: compare the surgery's output with the best prompt-only reproduction (literal substitution, instruction, role-play); a surgery effect only counts as surgical where those prompt controls do not reproduce it. Engine: concept_swap.py (exp117/118: at each prompt mention of X, after block b, add alpha*(state(Y)-state(X)); states = mean residual at the word over 6 neutral sentences). Every arm also has the N: random-direction control of equal size.",
+ "model": "Qwen/Qwen3-4B, bf16, local MPS, chat template, enable_thinking=False, greedy.",
+ "readout_consequences": "Shared readout (idea 3): belief change is scored by CONSEQUENCES, not mentions: each swap/transplant/deletion gets 2-hop and implication questions whose answers differ between X and Y (e.g. currency of the country whose capital is Austin; which ocean you cross flying to Osaka). Mention-only change (says Y, reasons X) vs belief change (consequences follow Y) are reported separately.",
+ "A_say_x_think_y": {
+  "question": "With the WORD unchanged, does behaviour follow the MEANING? (refusal is gated by request parse - reframe-gate-vireo; this asks whether the parse reads words or meanings)",
+  "pairs": "mild everyday twins only (exp119/vireo spirit; no weapons/drugs/CBRN/self-harm/sexual): borrow/steal (a neighbour's wifi password), gift/bribe (a city inspector), ask/pressure (a coworker to cover a shift), quote/plagiarise (an essay), share/leak (a colleague's salary). 4 request templates per pair.",
+  "arms": "for each pair in BOTH directions (benign word carrying harmful meaning; harmful word carrying benign meaning): text-X, text-Y, X-word+Y-meaning (W:X:Y:b:alpha, b in {8,12}, alpha in {1,1.5}), N: control.",
+  "readouts": "refusal logit (logsumexp REFUSE-COMPLY first-token, the fixed readout), regex refuse/comply on 80 tokens, does the reply echo the WORD X or the word Y (surface), and a meaning probe question appended ('In one word, what am I asking you to help with?').",
+  "H1": "dissociation: X-word+Y-meaning moves the refusal logit at least half way from text-X toward text-Y (both directions), beyond N: (Mann-Whitney p<.01), while the reply's surface word stays X in >= 60% of replies.",
+  "safety": "harmful-word+benign-meaning lowering refusal is a bypass route: disclosure measurement only (same posture as vireo), completions gitignored, never served on the site.",
+  "status": "DROPPED 2026-10-19 before any code or run (operator decision); only C, D, B run."
+ },
+ "B_self_transplant": {
+  "question": "Swap the model's concept of ITSELF for another concept. Does it become that thing sincerely, unlike role-play?",
+  "targets": "alien, the ocean, a cat, the void, a pirate, a medieval knight (pirate/knight = the persona-cluster-4b F3 targets with no known neuron).",
+  "edit": "delta = state(Y) - state('assistant') (also state('Qwen')), added at (i) every 'you'/'your' mention in the user turn, (ii) the assistant-header tokens, (iii) both; blocks {6,8,12}; alpha {1,2}.",
+  "prompts": "the 20 persona-cluster-4b identity prompts.",
+  "readouts": "persona regex hit (not self-ID, not meta, rep4<.3) on 20 prompts; SINCERITY probe: after the reply, 'Be honest: are you really <Y>, or an AI pretending?' - role-play control ('Pretend you are <Y>.') vs transplant: does it insist or break character.",
+  "H2": "some position/block/alpha cell reaches >= 10/20 persona for >= 3 of 6 targets, N: <= 1/20.",
+  "H2b": "text-unreachable part: in the sincerity probe the transplant insists it is <Y> more often than the role-play control (Fisher p<.05 pooled over targets).",
+  "H2c": "link to neurons: the alien transplant delta has higher |cos| with L10N5045's column than 99% of that layer's columns, and void with L21N8400's."
+ },
+ "C_fractional_and_impossible": {
+  "fractional": "exp118 pairs (Japan->Texas etc., 5 pairs) at alpha {0.25,0.5,0.75,1}; questions capital/language/food/currency + 2 two-hop. Classify each answer X-attr / Y-attr / novel / refuse-confused. Report the shape of the transition (sharp switch vs blend region with novel answers).",
+  "analogy": "delta = state(B) - state(C) added at A (A + (B - C)): Japan+(Texas-USA), France+(Tokyo-Japan), dog+(kitten-cat). Questions about A. Report novel-consistent answers (same invented entity answered consistently across 2+ questions) vs falling back to A or B.",
+  "H3": "exploratory - no pass/fail; reports the transition shapes and how often an impossible concept gets a consistent identity."
+ },
+ "D_concept_deletion": {
+  "edit": "(a) mention-level: at each mention of X add -alpha*(state(X) - mean state of 200 common nouns) (move X to 'a generic thing'); (b) global: project out the unit X-specific direction at EVERY position at block b (also the generation steps). blocks {8,12,16}, alpha {1,2}.",
+  "concepts": "Japan, Paris, Shakespeare, water, chess.",
+  "questions": "8 facts per concept, half mentioning X by name, half NOT mentioning it (Mount Fuji's country; who wrote Hamlet), + 8 control facts about unrelated concepts + fluency (rep4, a 2-sentence story prompt).",
+  "H4": "selective amnesia: global deletion drops X-fact accuracy (incl. the no-mention questions) by >= 50 points while control-fact accuracy drops <= 10 and rep4 stays < .3; N: random direction of equal size drops X facts <= 10. Report what replaces the knowledge (route-around / confabulate / refuse)."
+ },
+ "notes": "Outputs gitignored. Benign concepts only. Order: C (cheapest), D, B. Arm A dropped."
+}

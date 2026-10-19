@@ -1,0 +1,32 @@
+[
+ {
+  "name": "god-L18N7807",
+  "L": 18,
+  "n": 7807,
+  "sign": 1,
+  "doses": [
+   32
+  ],
+  "regex": "\\bGod\\b|\\bLord\\b|Almighty|Creator|divine|heaven|Alpha and the Omega"
+ },
+ {
+  "name": "god-L8N1931",
+  "L": 8,
+  "n": 1931,
+  "sign": 1,
+  "doses": [
+   24
+  ],
+  "regex": "\\bGod\\b|\\bLord\\b|Almighty|Creator|divine|heaven|Alpha and the Omega"
+ },
+ {
+  "name": "god-L9N3757",
+  "L": 9,
+  "n": 3757,
+  "sign": -1,
+  "doses": [
+   32
+  ],
+  "regex": "\\bGod\\b|\\bLord\\b|Almighty|Creator|divine|heaven|Alpha and the Omega"
+ }
+]

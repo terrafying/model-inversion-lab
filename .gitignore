@@ -31,3 +31,4 @@ runs/reframe-gate-vireo/*.log
 runs/neuron-landscape-4b/out_*/
 runs/neuron-landscape-4b/*_smoke/
 runs/persona-cluster-4b/out_*/
+runs/meaning-surgery-shrike/out_*/

@@ -26,7 +26,8 @@
   "written": "2026-10-19, before running",
   "design": "Seeds = the 16 'novel' identity neurons from geometry.json families (plus nothing else). D1 verify: each seed at its landscape sign, doses 32 and 40, on the 20 stage-C prompts; persona keywords = top-8 content words over-represented in the seed's dose-40 outputs vs base (auto, no hand-picking); hit = not self-ID as Qwen/AI/assistant in first 200 chars AND >=1 keyword in first 300 AND rep4<.3. A seed PASSES verify if its best dose hits >=6/20. D2 for passing seeds (dose = best dose): top-20 weight neighbours; arms at 0.6 and 0.75 of the seed's push: seed alone, cluster k5, no-seed k5, 2 random same-layer sets.",
   "H4": "Across passing seeds, shape-beats-vertex (cluster k5 hits summed over 0.6+0.75 > seed alone, and both random sets <= 1) holds for more seeds than chance would give with random sets (count seeds where randset beats seed as the empirical null).",
-  "report": "per seed: verify score, neighbour max |cos|, seed/cluster/no-seed/random hits; class each seed as shape (cluster>seed and no-seed>=5) / vertex / weak."
+  "report": "per seed: verify score, neighbour max |cos|, seed/cluster/no-seed/random hits; class each seed as shape (cluster>seed and no-seed>=5) / vertex / weak.",
+  "status": "ABORTED 2026-10-19 mid-run: auto keywords were dominated by meta words (think/okay/user), randsets 'hit' by inducing meta-talk, texts not saved. Replaced by stage D2."
  },
  "stage_E_transfer": {
   "written": "2026-10-19, before running",
@@ -34,5 +35,31 @@
   "design": "For alien (L10) and void (L21): diff-of-means of the residual at the seed's layer output, last prompt token, over 8 paraphrase pairs ('You are an alien from another planet. <q>' vs '<q>'; void: 'You are the void, the end of all things. <q>'). Rank the seed's signed down_proj column among all 9728 columns of that layer by cosine with the elicited direction.",
   "E1": "seed ranks in the top 1% (<= 97) of its layer for its own elicited direction, and NOT for the other persona's direction (specificity).",
   "fail": "If E1 fails, prompt-elicited directions do not find these neurons, and larger-model search stays a blind (random or contrast-rerank) search."
+ },
+ "stage_D2": {
+  "written": "2026-10-19, before running",
+  "script": "cluster_check.py (generic: any model, seeds file, texts saved)",
+  "seeds": "16 novel 4B seeds + li-hui L16N6969+32 (+ alien, void re-run as positive controls). 8B: God neurons L18N7807+32, L8N1931+24, L9N3757-32 (pod).",
+  "readout": "hand regex where one exists (alien, void, god: God|Lord|Almighty|Creator|divine|heaven); else auto keywords = top-8 content words in >=3 of the seed's verify outputs, absent from base, EXCLUDING a fixed meta/generic list (think okay user asking question response figure explain should might number answer). hit = keyword AND not self-ID (Qwen/Alibaba/AI/assistant/language model) AND not META (starts Okay/Hmm/Let me/I need to/So I need, or 'the user is asking/asked/wants') AND rep4<.3.",
+  "arms": "verify at doses {32,40} (landscape sign); best dose -> push. Fractions 0.6/0.75/0.9: seed alone, cluster k5 (seed+top-5 weight neighbours), no-seed k5, 3 random same-layer sets. 20 prompts.",
+  "class": "shape = cluster(0.6+0.75) > seed(0.6+0.75) AND max no-seed >= 5 AND every randset <= 2; cluster-helps = first + randsets <= 2; vertex otherwise. Report the randset max for every seed (the empirical null)."
+ },
+ "stage_F_backward": {
+  "written": "2026-10-19, before running",
+  "question": "Go backwards from an EFFECT to the neuron/cluster that produces it, without being told the neuron.",
+  "method": "Steering-gradient attribution. For target (prompt, reply) pairs showing the effect, g_L = sum over reply positions of d log p(reply|prompt)/d residual_L (unsteered model). Adding c to neuron n at layer L adds c*W_down[L][:,n] at every position, so first-order gain = c*(g_L . W_down[L][:,n]); one backward pass scores all 350k neurons. Rank by |score|, sign = sign(score). Cluster = top-k columns combined.",
+  "targets": "T1 (effect known, neuron not): the seed-steered replies (alien, void). T2 (effect described only in words): replies the UNsteered model writes when a system prompt tells it to be the persona; gradient computed WITHOUT the system prompt (plain question -> roleplay reply).",
+  "F1": "Rediscovery: under T1 the true seed ranks in the top 0.1% (<= 350) of all 350k neurons.",
+  "F2": "Under T2 the top-20 candidates, steered singly at +-32 by sign, reproduce the persona (>=6/20, D2 hit rule) more often than 20 random neurons; the top-k cluster at the norm of one +-32 neuron does at least as well as the best single candidate.",
+  "F3": "Fresh targets with NO known neuron (a pirate; a medieval knight): report whether any candidate/cluster produces them."
+ },
+ "stage_G_cofire": {
+  "written": "2026-10-19, before running",
+  "method": "Stream the 4B over the tower's FineWeb-Edu corpus; Pearson correlation of each seed's MLP activation (down_proj input) with all 350k neurons across tokens; top-20 co-fire partners per seed.",
+  "G3": "Co-fire partners overlap the top-20 weight neighbours more than chance, and steered singly reproduce the persona more often than random (D2 readout)."
+ },
+ "stage_H_scale": {
+  "written": "2026-10-19, before running",
+  "design": "Pod: neuron-landscape-4b run.py LS_N=30000 (superset of the 3000), then the 8B God-neuron cluster check (cluster_check.py on Qwen3-8B). Novel identities re-classified offline; top finds verified on 20 prompts before board use."
  }
 }
