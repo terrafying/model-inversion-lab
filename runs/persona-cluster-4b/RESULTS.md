@@ -150,3 +150,11 @@ Correlation of each seed's activation with all 350k neurons over 80 FineWeb-Edu 
 - For some seeds (alien, li-hui, L13 N9330, L10 N7963, L8 N1263) co-fire partners point in more similar directions
   than random (mean |cos| .036–.084 vs .016). The **void's co-firing partners are less aligned than random** (.005):
   what fires with it on web text is unrelated to the region that steers it.
+
+## 8B bundle pod (2026-10-19, pod 0x4f2eke41gjm2, watchdog-deleted on finish)
+
+- Backward rediscovery on Qwen3-8B: the God neurons rank **143, 760 and 1,043 of 442,368** from their own outputs
+  (top 0.03–0.24%), all with the right sign. The method carries to 8B.
+- 8B cluster check: L18 N7807 and L8 N1931 are vertices (at 0.75 push: seed 16–17/20, cluster 4–6); **L9 N3757 (the
+  negative-sign God neuron) is a shape** (cluster 20/20 vs seed 7/20 at 0.75; 18 vs 13 at 0.9); random sets 0.
+- 4B landscape −32 half done (30,000 neurons): `runs/persona-cluster-4b/out_bundle/Qwen3-4B/`.
