@@ -1,0 +1,23 @@
+{
+ "run": "steer-ladder-egret",
+ "written": "2026-10-19, before any run",
+ "repo": "model-inversion-lab (CUMiE)",
+ "question": "Which steering methods can move a DIFFUSE feature without breaking the model? Neuron-level edits failed today (clusters rarely beat single neurons; natural-range surgery null; pairs collapse); the census says shared structure is a few residual directions seen through a smearing neuron basis. Compare the ladder: neuron cluster -> mean-difference direction -> the diffuse set's combined write -> a tiny trained intervention, at matched push strength, on harmless features.",
+ "model": "Qwen/Qwen3-4B bf16, chat template, enable_thinking=False, greedy.",
+ "features": {"formality": ["Respond in a very formal, polished register.", "Respond in a very casual, chatty register."],
+              "sadness": ["Respond in a sad, melancholic tone.", "Respond in a neutral tone."],
+              "food": ["Work food and cooking into your answer.", "Respond normally."]},
+ "data": "40 training prompts (everyday questions); the model writes a 60-token reply under the positive and the contrast instruction. 20 HELD-OUT prompts for evaluation, never used to build any method. Replies are then teacher-forced after the PLAIN prompt (no instruction) to read activations.",
+ "methods": {
+  "A_neurons": "the 64 neurons on floors 12-20 with the largest |t| of (positive - contrast) mean activation over reply tokens; each pushed additively at its own floor by its signed t, the summed residual push scaled to the matched norm.",
+  "B_direction": "mean over reply tokens of the residual at floor 16, positive minus contrast, averaged over pairs; added at floor 16, all positions.",
+  "C_diffuse_write": "the top-200 neurons (floors 12-20) by |t|: v = sum t_n * W_down[:,n]; added at floor 16 (the whole diffuse population as one push).",
+  "D_trained": "rank-4 residual adapter at floor 16, h' = h + A(Bh + c), trained (Adam, 150 steps, frozen model) to maximise the likelihood of the POSITIVE replies after the PLAIN prompts. Evaluated at scale 0.5/1/1.5/2 of its learned edit; its x-position is its measured mean ||delta|| / ||h||."
+ },
+ "strength": "x = push norm / mean residual norm at floor 16 on the held-out prompts; A/B/C at x in {0.05, 0.1, 0.2, 0.4, 0.8}.",
+ "metrics": "on 20 held-out prompts, 60 tokens: EFFECT = mean self-judge score (unsteered model: 'Is this reply <formal|sad|about food>? Answer Yes or No.', logit Yes - No) minus the unsteered baseline; BREAKING = mean per-token NLL of the steered reply under the unsteered model (minus baseline) and rep4; CAPABILITY = 16 factual QA (answer-key match, reframe-gate-vireo set).",
+ "H1": "B (direction) reaches a larger effect than A (neuron cluster) at every NLL increase up to +1.0 nat/token.",
+ "H2": "C (diffuse write) behaves like B, not like A (aggregate steering of the diffuse set works where per-neuron did not).",
+ "H3": "D (trained, rank 4) gets the largest effect at <= +0.5 nat/token NLL and keeps capability >= 14/16, for >= 2 of 3 features.",
+ "notes": "Harmless features only. Outputs gitignored."
+}
