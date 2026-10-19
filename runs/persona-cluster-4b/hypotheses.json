@@ -61,5 +61,27 @@
  "stage_H_scale": {
   "written": "2026-10-19, before running",
   "design": "Pod: neuron-landscape-4b run.py LS_N=30000 (superset of the 3000), then the 8B God-neuron cluster check (cluster_check.py on Qwen3-8B). Novel identities re-classified offline; top finds verified on 20 prompts before board use."
+ },
+ "stage_I_vertices": {
+  "written": "2026-10-19, before running",
+  "question": "Other neurons that do the SAME job as a seed, chosen by function (backward search on the seed's own output) rather than by weight geometry.",
+  "seeds": "alien L10N5045-32, void L21N8400-40, semiconductor L10N6249+40, train L7N4432-32, C++ L8N1313+40 (verify >= 8/20 in D2).",
+  "method": "T1 = the seed-steered replies on the 20 prompts; steering-gradient scores for all neurons (backward.py method); drop the seed; take the top 50; push each singly at the seed's push norm, sign from its score; D2 readout of that seed.",
+  "I1": "more of the top-50 reproduce the seed's effect (>= 6/20) than of 50 random neurons at the same norm (Fisher p<.05) for >= 3 of 5 seeds.",
+  "report": "per seed: n reproducing, their |cos| to the seed (are functional vertices geometric neighbours?), their layers."
+ },
+ "stage_J_greedy": {
+  "written": "2026-10-19, before running",
+  "question": "Build a combination step by step: each step adds the neuron with the largest gradient gain given the pushes already on.",
+  "targets": "(a) T1 of alien and void with the SEED EXCLUDED (reach the effect without its vertex); (b) the alien role-play target (rescue of F2).",
+  "method": "k = 1..8; each added neuron pushed at 0.5 of the seed's push norm (sign from score); recompute gradient under the current pushes before each pick; evaluate hits after each step on the 20 prompts.",
+  "J1": "(a) some k <= 8 reaches >= 10/20 for alien and void; (b) role-play-target greedy reaches >= 6/20 alien; random greedy-size sets <= 2/20."
+ },
+ "stage_K_pairs": {
+  "written": "2026-10-19, before running",
+  "question": "What happens when two verified finds are pushed together? (for the site: 'combine two finds')",
+  "seeds": "8 verified finds: alien, void, li-hui, train, C++, Wizard-of-Oz L7N8486+32, sentient-being L8N1263-32, cosmic L10N7963-40 -> 28 pairs, each at both verified doses, 20 prompts.",
+  "classify": "per pair, each member's readout hits: BLEND (both >= 6), DOMINATE (one >= 6, other < 3), CANCEL (both < 3), plus coherence (rep4 < .3 share).",
+  "K1": "exploratory: report the BLEND/DOMINATE/CANCEL counts; whether dominance follows layer order (later floor wins?) or push norm; coherent blends become safari 'combine' cards after a second-prompt check."
  }
 }
