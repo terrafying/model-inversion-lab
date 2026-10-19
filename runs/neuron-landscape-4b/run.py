@@ -102,7 +102,7 @@ if (OUT / "catalogue.jsonl").exists():
 
 cf = open(OUT / "catalogue.jsonl", "a"); df = open(OUT / "distinct.jsonl", "a")
 t0 = time.time(); ncat = {}
-for sign in (1, -1):
+for sign in [int(x) for x in os.environ.get("LS_SIGNS", "1,-1").split(",")]:   # LS_SIGNS=-1 runs only the negative pass
     todo = [(L, n) for (L, n) in sample if (L, n, sign) not in done]
     for i in range(0, len(todo), BS):
         blk = todo[i:i + BS]

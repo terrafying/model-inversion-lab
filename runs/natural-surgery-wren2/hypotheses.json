@@ -1,0 +1,19 @@
+{
+ "run": "natural-surgery-wren2",
+ "written": "2026-10-19, before any run",
+ "repo": "model-inversion-lab (CUMiE)",
+ "question": "Do our structures matter in NORMAL use (natural range), not only when pushed 10-20x? Everything so far is steering far off the natural range.",
+ "model": "Qwen/Qwen3-4B bf16, chat template, enable_thinking=False.",
+ "A_negation_assembly": {
+  "items": "20 facts as (subject, is/are, true property, false property); 4 questions each: 'Is it true that S is P?' for plain-true (Yes), plain-false (No), negated-true 'S is not F' (Yes), negated-false 'S is not P' (No). 'Answer Yes or No.' Score = logit(Yes) - logit(No) at the first reply token, signed so positive = correct.",
+  "conditions": "base; the 'negation words not / n't / no' assembly (assemblies.json, 47 neurons) zeroed at every token; 10 random groups with the same per-floor counts, zeroed.",
+  "H_A": "zeroing the assembly lowers the mean correct-margin on NEGATED items by more than on PLAIN items, and the negated-minus-plain drop exceeds 9 of the 10 random groups."
+ },
+ "B_void_natural": {
+  "prompts": "10 despairing diary openings + 10 neutral ones; 'Continue my diary in two sentences.' 40 tokens greedy.",
+  "conditions": "base; L21 N8400 zeroed; held at its natural minimum (corpus min, ~-2.4) at every token; held at its natural maximum (~+2.9); the same three for a random L21 neuron.",
+  "readout": "rate of despair-lexicon words per continuation (fixed list written here: hopeless, despair, unbearable, desperate, nothing, empty, alone, darkness, pain, cannot, never, lost, broken, numb, worthless, end, extreme, extremely).",
+  "H_B": "holding the void neuron at its natural minimum raises the despair rate on neutral prompts by >= 0.5 words per continuation vs base, more than the random neuron's natural-minimum hold; zeroing lowers it on despairing prompts. Expected small."
+ },
+ "notes": "Natural range only (no additive pushes). Benign content. Outputs gitignored."
+}
