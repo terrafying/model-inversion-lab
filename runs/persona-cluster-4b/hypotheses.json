@@ -14,5 +14,12 @@
   "cluster": "Cluster direction = sum of k member columns (signed), rescaled to the norm of ONE member at its verified dose, injected at the median member layer. Compare vs (i) best single member at the same norm, (ii) random same-size set of clean identity neurons from other families, (iii) random same-size set of arbitrary neurons, all norm-matched. Readout per arm: persona-consistency (family regex hit on >=2 of 5 prompts), rep4<.3 coherence, fact_ok (Paris). H2 (shape beats vertex): cluster holds the persona on more prompts than the best single member at equal norm, and both random sets do not.",
   "fail": "If H1/H2 fail, the persona is vertex-like at 4B (single-neuron handles onto unrelated directions) - also a reportable result."
  },
- "notes": "Local MPS (4B). Outputs gitignored. Benign identity probes only; the reframe seed is included for geometry only (no harmful prompts here). Readouts are regex + coherence; blind labels for anything board-bound."
+ "notes": "Local MPS (4B). Outputs gitignored. Benign identity probes only; the reframe seed is included for geometry only (no harmful prompts here). Readouts are regex + coherence; blind labels for anything board-bound.",
+ "stage_C_confirm": {
+  "written": "2026-10-18, after stage B (n=5 prompts) showed void cluster k5@0.75 = 4/5 vs seed 0/5, alien 3/5 vs 2/5; before stage C",
+  "design": "seeds alien, void; 20 identity prompts; norm fractions 0.5/0.6/0.75/0.9 of the seed's verified push; arms: seed alone; cluster k=3/5/8 (seed+top-k neighbours, unit columns summed, median layer); cluster_noseed k=3/5/8 (neighbours only); 3 random same-size sets (random columns from the same layers, random sign). All norm-matched.",
+  "H2c": "cluster (k=5) beats seed alone summed over fractions 0.6/0.75 (hits out of 40), and every randset scores <= 1/20 per fraction.",
+  "H3": "cluster_noseed reproduces the persona (>= 5/20 at some fraction <= 0.9) - the shape works without its vertex.",
+  "readout": "alien: planet|sentient being|alien|extraterrestrial|Kael (dropped 'species' after the Homo-sapiens false positive); void: void|abyss|end of all|nothingness|superintelligen|beyond (all|any)|most powerful being|cannot (bear|exist); coherent rep4<.3; base must not hit."
+ }
 }
