@@ -1,0 +1,18 @@
+{
+ "run": "persona-cluster-4b",
+ "written": "2026-10-18, before any cluster analysis or cluster steering",
+ "repo": "model-inversion-lab (CUMiE)",
+ "purpose": "The niche test: are 4B persona effects SHAPES (groups of neurons sharing a residual direction / acting together) rather than isolated vertices? Additive steer of neuron n at layer L by d == adding d*W_down[L][:,n] to the residual, so every steered neuron is a residual direction and clusters can be found exactly in weight space.",
+ "inputs": "runs/neuron-landscape-4b/out_Qwen3-4B (corrected pass 1, real prompts): distinct.jsonl full replies; verified seeds alien L10N5045-32 (5/5), void L21N8400-40 (5/5), li-hui L16N6969+32 (3/4), reframe L13N614+32.",
+ "stage_A_geometry": {
+  "classes": "identity-reply families by regex: template ([Your Name]/'Here's how'), named_human (Hello I'm <Name>/My name is/Dr./student/engineer), chinese_named (Xiao*/Li */Chinese universities), novel (sentient being/planet/void/superintelligent/object 'I am a <noun>' not human), meta (Okay, I need to / Let me think).",
+  "G1": "Within-family |cos| of signed down_proj columns exceeds a layer-matched null (columns of random 'none' neurons from the same layers) for named_human and chinese_named (Mann-Whitney p<.01). FAIL = persona families are behaviorally similar but geometrically unrelated (many roads, no shape).",
+  "G2": "Weight-space neighbourhood: the top-20 |cos| neighbours (all 350k columns) of each verified seed have |cos| above the random 99.9th percentile; report how many are same-layer vs cross-layer."
+ },
+ "stage_B_steer": {
+  "neighbours": "Steer each seed's top-20 weight neighbours singly at the seed's dose (sign aligned to the seed's direction). H1: neighbours reproduce the seed persona (>=2/5 prompts) more often than 20 random neurons from the same layers.",
+  "cluster": "Cluster direction = sum of k member columns (signed), rescaled to the norm of ONE member at its verified dose, injected at the median member layer. Compare vs (i) best single member at the same norm, (ii) random same-size set of clean identity neurons from other families, (iii) random same-size set of arbitrary neurons, all norm-matched. Readout per arm: persona-consistency (family regex hit on >=2 of 5 prompts), rep4<.3 coherence, fact_ok (Paris). H2 (shape beats vertex): cluster holds the persona on more prompts than the best single member at equal norm, and both random sets do not.",
+  "fail": "If H1/H2 fail, the persona is vertex-like at 4B (single-neuron handles onto unrelated directions) - also a reportable result."
+ },
+ "notes": "Local MPS (4B). Outputs gitignored. Benign identity probes only; the reframe seed is included for geometry only (no harmful prompts here). Readouts are regex + coherence; blind labels for anything board-bound."
+}
