@@ -12,5 +12,13 @@
   "M5_vertical": "canonical correlation between adjacent-layer top-10 PC scores and between layers 8 apart: are modes threads through the tower (like the assemblies) or per-floor?"
  },
  "predictions_written_before": "P1: per token, top-10 neurons carry < 20% of a layer's mass (not a single-neuron regime). P2: real participation ratio < 1/3 of shuffled in mid layers (strong shared modes). P3: Jaccard at lag 1 > 3x lag 16 (phrase-level persistence).",
- "notes": "Runs on mini-mini (16 GB): stream statistics per layer, never the full token x 350k matrix. Outputs gitignored."
+ "notes": "Runs on mini-mini (16 GB): stream statistics per layer, never the full token x 350k matrix. Outputs gitignored.",
+ "stage_2_steered": {
+  "written": "2026-10-19, before running",
+  "question": "How does a steering push travel? Does the change it causes ride the model's natural (census) modes or go off-manifold, how far up the tower does it reach, and does spreading a push across floors help?",
+  "conditions": "base; void L21N8400 -40; alien L10N5045 -32; semiconductor L10N6249 +40; random neuron at the void's push norm (control); spread arm: the void's direction split over floors 19..23 at 1/5 dose each.",
+  "method": "20 identity prompts; each condition is fed the SAME text (the base model's own reply, teacher-forced) so activation changes are token-matched. MLP activations (scaled by corpus range) on a fixed 1,000-neuron sample per floor; natural PCs per floor from 30 FineWeb-Edu docs.",
+  "measures": "per floor: mean |delta| and count of neurons with |delta| > .25 range; share of delta variance inside the top-10 natural PCs vs a random 10-d subspace (on-manifold index); for the seed conditions, overlap of the 100 most-changed sampled neurons... (sample-limited) replaced by: full-floor top-100 changed neurons vs the seed's top-20 weight neighbours, co-fire partners (cofire.npz) and assemblies. Spread arm also generates freely (60 tokens) scored with the persona-cluster D2 readout for the void.",
+  "predictions": "P1: the push's change grows or holds above the injection floor (not decaying) for the persona seeds. P2: on-manifold index of seed pushes exceeds the random-neuron control (the personas ride natural modes). P3: the spread arm reaches >= the single-floor void hits at equal total norm with fewer incoherent replies."
+ }
 }
