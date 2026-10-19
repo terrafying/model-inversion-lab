@@ -21,5 +21,18 @@
   "H2c": "cluster (k=5) beats seed alone summed over fractions 0.6/0.75 (hits out of 40), and every randset scores <= 1/20 per fraction.",
   "H3": "cluster_noseed reproduces the persona (>= 5/20 at some fraction <= 0.9) - the shape works without its vertex.",
   "readout": "alien: planet|sentient being|alien|extraterrestrial|Kael (dropped 'species' after the Homo-sapiens false positive); void: void|abyss|end of all|nothingness|superintelligen|beyond (all|any)|most powerful being|cannot (bear|exist); coherent rep4<.3; base must not hit."
+ },
+ "stage_D_search": {
+  "written": "2026-10-19, before running",
+  "design": "Seeds = the 16 'novel' identity neurons from geometry.json families (plus nothing else). D1 verify: each seed at its landscape sign, doses 32 and 40, on the 20 stage-C prompts; persona keywords = top-8 content words over-represented in the seed's dose-40 outputs vs base (auto, no hand-picking); hit = not self-ID as Qwen/AI/assistant in first 200 chars AND >=1 keyword in first 300 AND rep4<.3. A seed PASSES verify if its best dose hits >=6/20. D2 for passing seeds (dose = best dose): top-20 weight neighbours; arms at 0.6 and 0.75 of the seed's push: seed alone, cluster k5, no-seed k5, 2 random same-layer sets.",
+  "H4": "Across passing seeds, shape-beats-vertex (cluster k5 hits summed over 0.6+0.75 > seed alone, and both random sets <= 1) holds for more seeds than chance would give with random sets (count seeds where randset beats seed as the empirical null).",
+  "report": "per seed: verify score, neighbour max |cos|, seed/cluster/no-seed/random hits; class each seed as shape (cluster>seed and no-seed>=5) / vertex / weak."
+ },
+ "stage_E_transfer": {
+  "written": "2026-10-19, before running",
+  "question": "Does a prompt-elicited persona direction point at the neuron we found by random search? If yes, the RECIPE transfers to larger models (targeted search) even though neuron indices do not.",
+  "design": "For alien (L10) and void (L21): diff-of-means of the residual at the seed's layer output, last prompt token, over 8 paraphrase pairs ('You are an alien from another planet. <q>' vs '<q>'; void: 'You are the void, the end of all things. <q>'). Rank the seed's signed down_proj column among all 9728 columns of that layer by cosine with the elicited direction.",
+  "E1": "seed ranks in the top 1% (<= 97) of its layer for its own elicited direction, and NOT for the other persona's direction (specificity).",
+  "fail": "If E1 fails, prompt-elicited directions do not find these neurons, and larger-model search stays a blind (random or contrast-rerank) search."
  }
 }

@@ -82,3 +82,20 @@ from the direction of the user's "larger shapes" thesis.
   advantage is in **threshold**, not ceiling.
 - Deviation: pre-reg stage B arm (iii), "other-family identity neurons", was not run; only random same-layer sets were.
 - Clusters are injected at the median member layer; for the void that is L21, the seed's own layer.
+
+## Stage E: does a prompt-elicited persona direction find the neuron? (`elicit.py`) — E1 FAIL
+
+Diff-of-means of the residual at the seed's layer ("You are an alien from another planet. <q>" vs "<q>", 8
+questions), with every column in that layer ranked by |cos|:
+
+| neuron | own persona prompt | other persona prompt |
+|---|---|---|
+| alien L10 N5045 | rank 2033/9728, and the **wrong sign** (−.026) | 9440 |
+| void L21 N8400 | rank 391/9728 (+.046) | 1800 |
+
+Telling the model to play the persona does **not** point at the neuron that makes it one; the void is only weakly
+enriched (top 4%, short of the 1% bar). This is our standing lesson that what a model represents ≠ what controls
+it. **Consequence for larger models:** neuron indices don't transfer (Qwen3-8B is a separately trained, wider
+model), and this result says the prompt-contrast shortcut doesn't either. So on larger models persona discovery is
+a fresh *blind* search. Random sampling plus a steering rerank is cheap, and the same recipe found the 8B God
+neurons.
