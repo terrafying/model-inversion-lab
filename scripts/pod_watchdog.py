@@ -11,12 +11,13 @@ def get(p, head=False):
         r = urllib.request.urlopen(urllib.request.Request(U + p, method="HEAD" if head else "GET"), timeout=60)
         return r if head else r.read()
     except Exception: return None
-def newest():
-    t = 0
-    for p in ["boot.log", "map.log", "cc8b.log", "gb.log"]:   # not mem.log: it ticks even when a job hangs
-        r = get(p, head=True)
-        if r and r.headers.get("Last-Modified"): t = max(t, email.utils.parsedate_to_datetime(r.headers["Last-Modified"]).timestamp())
-    return t
+def progress():
+    """total bytes of the job logs: grows while anything is working (headers are unreliable through the proxy)"""
+    n = 0
+    for p in ["boot.log", "map.log", "cc8b.log", "gb.log"]:
+        b = get(p)
+        if b: n += len(b)
+    return n
 def finish(why):
     print(time.strftime("%T"), "finishing:", why, flush=True)
     for p in paths + ["boot.log", "map.log", "cc8b.log", "gb.log", "mem.log", "dmesg_map.txt", "dmesg_cc8b.txt", "dmesg_gb.txt"]:
@@ -26,11 +27,11 @@ def finish(why):
     try: print("delete", urllib.request.urlopen(req, timeout=60).status, flush=True)
     except Exception as e: print("DELETE FAILED - delete the pod by hand:", e, flush=True)
     sys.exit(0)
-t0 = time.time()
+t0 = time.time(); last_n, last_t = -1, time.time()
 while True:
     time.sleep(120)
     if get("FINISHED") is not None: finish("FINISHED")
-    nt = newest()
-    if nt and time.time() - nt > stale * 60: finish(f"logs stale for {stale} min")
-    if not nt and time.time() - t0 > 40 * 60: finish("no logs after 40 min")
-    print(time.strftime("%T"), "alive, newest log", time.strftime("%T", time.gmtime(nt)) if nt else "-", flush=True)
+    n = progress()
+    if n != last_n: last_n, last_t = n, time.time()
+    if time.time() - last_t > stale * 60: finish(f"no log growth for {stale} min")
+    print(time.strftime("%T"), "alive, log bytes", n, "unchanged for", int((time.time() - last_t) / 60), "min", flush=True)
