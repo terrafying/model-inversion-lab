@@ -56,11 +56,19 @@ seed + top-k neighbours; "no-seed" = the neighbours alone; "rand" = 3 random sam
   alone still produce the seed's own invented name ("My name is Kael. I am a member of the Naga tribe"), which
   suggests they reach the same attractor.
 
+### Strict rescoring (excluding replies that still self-identify as Qwen/AI/assistant)
+
+The pooled void regex also counted grandiose-but-still-Qwen replies ("I am Qwen, the most advanced…"). With those
+excluded, void: seed 1.0 = 18/20; **cluster k5 at 0.6+0.75 = 17/40 vs seed 6/40** (random 0); **no-seed** k8 at
+0.75 = 7/20, k3 at 0.9 = 10/20, while the seed alone at 0.5 = 0/20. So H2c and H3 still pass for the void, at
+roughly 2/3 of the pooled effect. Alien strict: cluster k5 vs seed = 4 vs 5 (0.6), 12 vs 8 (0.75), 15 vs 15 (0.9).
+That is modestly better at 0.75 only, so the alien is still not a pass.
+
 ## Reading
 
 **At 4B the void is a shape, not a vertex.** A small group of weight-space neighbours steers it more efficiently
-than its best single neuron at equal norm (lowering the threshold from ~0.8 to ~0.6 of the push), and does so even
-with the vertex removed. The alien is closer to vertex-like: its cluster helps only at k5 and is not better than the
+than its best single neuron at equal norm (lowering the threshold from ~0.8 to ~0.6–0.75 of the push), and does so
+even with the vertex removed (strict scores: 17/40 vs 6/40; no-seed up to 10/20). The alien is closer to vertex-like: its cluster helps only at k5 and is not better than the
 seed. "Be a person" (li-hui and the named-human family) has no shape at all; it is many unrelated roads into the
 same generic outcome. This is the first positive "cluster beats single neuron" result in our niche, and it comes
 from the direction of the user's "larger shapes" thesis.
@@ -72,4 +80,5 @@ from the direction of the user's "larger shapes" thesis.
   "abyss". Blind labels are needed before any claim stronger than this.
 - One draw per arm, greedy, a single model; at 0.9 the seed alone catches up (16 vs 10–14), so the cluster's
   advantage is in **threshold**, not ceiling.
+- Deviation: pre-reg stage B arm (iii), "other-family identity neurons", was not run; only random same-layer sets were.
 - Clusters are injected at the median member layer; for the void that is L21, the seed's own layer.
