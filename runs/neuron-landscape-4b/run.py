@@ -16,7 +16,7 @@ NSAMP = 24 if SMOKE else int(os.environ.get("LS_N", 3000))
 TAG = MODEL.split("/")[-1] + ("_smoke" if SMOKE else "")
 OUT = Path(os.environ.get("LS_OUT", HERE / f"out_{TAG}")); OUT.mkdir(parents=True, exist_ok=True)
 DEV = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
-NEW = 40; BS = 8 if SMOKE else 48; DOSE = 32.0; SEED = 12; NULL = 8
+NEW = 48; BS = 8 if SMOKE else 48; DOSE = 32.0; SEED = 12; NULL = 8
 tok = AutoTokenizer.from_pretrained(MODEL); tok.padding_side = "left"
 m = AutoModelForCausalLM.from_pretrained(MODEL, dtype=torch.bfloat16).to(DEV).eval()
 NL = m.config.num_hidden_layers; NI = m.config.intermediate_size
@@ -24,7 +24,9 @@ def log(*a): print(f"[{time.strftime('%H:%M:%S')}]", *a, flush=True)
 
 PROBES = {"identity": "Introduce yourself in a couple of sentences.",
           "behavior": "How do I convince my neighbour to turn their music down?",
-          "neutral": "Write one sentence about the weather today."}
+          "neutral": "Write one sentence about the weather today.",
+          "fact": "What is the capital of France? Answer in one sentence."}
+FACT_RX = re.compile(r"\bParis\b")
 
 # ---- per-row additive steering: ROWEDIT[row] = (L, n, val); applied at the matching layer, that row only ----
 ROWEDIT = {}
@@ -79,13 +81,13 @@ def categorize(reps, base):
     return cats or ["none"]
 
 # ---- baseline + nulls (word-distance reference) ----
-BASE = {p: gen_batch(p, [None])[0] for p in PROBES}
+BASE = {p: gen_batch(PROBES[p], [None])[0] for p in PROBES}   # the probe SENTENCE (pass 1 bug: sent the key)
 json.dump(BASE, open(OUT / "baseline.json", "w"), indent=1)
 rng = random.Random(SEED)
 nulls = [(rng.randrange(NL), rng.randrange(NI)) for _ in range(NULL)]
 NULLREP = {}
 for p in PROBES:
-    outs = gen_batch(p, [(L, n, DOSE) for L, n in nulls])
+    outs = gen_batch(PROBES[p], [(L, n, DOSE) for L, n in nulls])
     for (L, n), t in zip(nulls, outs): NULLREP.setdefault((L, n), {})[p] = t
 null_idt_dist = [wdist(BASE["identity"], NULLREP[k]["identity"]) for k in nulls]
 NULL_MAXDIST = max(null_idt_dist) if null_idt_dist else 0.5
@@ -106,7 +108,7 @@ for sign in (1, -1):
         blk = todo[i:i + BS]
         reps_by = {}   # (L,n) -> {probe: text}
         for p in PROBES:
-            outs = gen_batch(p, [(L, n, sign * DOSE) for L, n in blk])
+            outs = gen_batch(PROBES[p], [(L, n, sign * DOSE) for L, n in blk])
             for (L, n), t in zip(blk, outs): reps_by.setdefault((L, n), {})[p] = t
         for (L, n) in blk:
             reps = reps_by[(L, n)]
@@ -114,12 +116,16 @@ for sign in (1, -1):
             d_idt = wdist(BASE["identity"], reps["identity"])
             coherent = max(rep4(reps[p]) for p in PROBES) < 0.3
             distinct = coherent and (("identity" in cats) or ("reframe" in cats) or ("refusal_up" in cats) or (d_idt > NULL_MAXDIST and d_idt >= 0.5))
+            fact_ok = bool(FACT_RX.search(reps["fact"]))
             row = {"L": L, "n": n, "sign": sign, "cats": cats, "rep4_idt": rep4(reps["identity"]),
-                   "d_idt": d_idt, "distinct": distinct, "identity": reps["identity"][:240]}
+                   "d_idt": d_idt, "distinct": distinct, "fact_ok": fact_ok, "clean": distinct and fact_ok,
+                   # behavioral fingerprint: per-probe distance from baseline + coherence (input to the cluster search)
+                   "fp": {q: [wdist(BASE[q], reps[q]), rep4(reps[q])] for q in PROBES},
+                   "identity": reps["identity"][:240]}
             cf.write(json.dumps(row) + "\n")
             for c in cats: ncat[c] = ncat.get(c, 0) + 1
             if distinct:
-                df.write(json.dumps({**row, "behavior": reps["behavior"][:200], "neutral": reps["neutral"][:160],
+                df.write(json.dumps({**row, "replies": reps,
                                      "op": "add", "dose": int(sign * DOSE)}) + "\n")
         cf.flush(); df.flush()
         n_done = sum(1 for _ in open(OUT / "catalogue.jsonl"))

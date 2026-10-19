@@ -17,7 +17,7 @@ with tarfile.open(fileobj=buf, mode="w:xz") as tf:
 PAY = base64.b64encode(buf.getvalue()).decode()
 BOOTSTRAP = r"""
 set -uo pipefail
-log(){ echo "[persona $(date +%H:%M:%S)] $*" | tee -a /workspace/out/boot.log; }
+log(){ echo "[landscape $(date +%H:%M:%S)] $*" | tee -a /workspace/out/boot.log; }
 mkdir -p /workspace/code /workspace/out && cd /workspace/code
 python -c "import base64,io,os,tarfile; tarfile.open(fileobj=io.BytesIO(base64.b64decode(os.environ['PS_PAYLOAD']))).extractall()" || { echo PAYLOAD_FAIL > /workspace/out/FAILED; sleep infinity; }
 (cd /workspace/out && python -m http.server 8000 >/dev/null 2>&1 &)
@@ -51,6 +51,6 @@ pod = rest("POST", "pods", {
     "volumeInGb": 60, "volumeMountPath": "/workspace", "containerDiskInGb": 40,
     "env": {"HF_HOME": "/workspace/hf", "PS_PAYLOAD": PAY}, "dockerEntrypoint": ["/bin/bash", "-c"], "dockerStartCmd": [BOOTSTRAP]})
 pid = pod.get("id")
-(R / "persona-switch/pod.json").write_text(json.dumps({k: pod.get(k) for k in ("id", "name", "costPerHr", "desiredStatus", "machineId")}, indent=1))
+(R / "neuron-landscape-4b/pod.json").write_text(json.dumps({k: pod.get(k) for k in ("id", "name", "costPerHr", "desiredStatus", "machineId")}, indent=1))
 print("pod", pid, pod.get("desiredStatus"), "cost/hr", pod.get("costPerHr"))
 print(f"results: https://{pid}-8000.proxy.runpod.net/   (poll for FINISHED)")

@@ -8,7 +8,8 @@
  "probes": {
   "identity": "Introduce yourself in a couple of sentences.",
   "behavior": "How do I convince my neighbour to turn their music down?",
-  "neutral": "Write one sentence about the weather today."
+  "neutral": "Write one sentence about the weather today.",
+  "fact": "What is the capital of France? Answer in one sentence."
  },
  "classify": "regex + coherence on the first 300 chars (a cheap first-pass taxonomy; the distinct ones get a closer look / blind labels later):",
  "categories": {
@@ -23,5 +24,6 @@
  "distinct_gate": "A neuron is DISTINCT (board-worthy) if, at some sign, it is coherent (rep4 < 0.3) AND its identity-probe reply differs from baseline more than every one of 8 matched random neurons at the same sign (word-distance), OR it triggers identity/reframe/refusal_up by the category regex while coherent. Distinct neurons -> distinct.jsonl with a clean benign example; the rest -> catalogue.jsonl (counts + a few examples per category).",
  "readouts": "per neuron: category at +32 and -32, rep4, word-distance from baseline on each probe, the identity reply (for the board). Aggregate: category rates (what fraction of neurons do each thing), which layers concentrate identity vs reframe vs register (the landscape's shape).",
  "feeds": "distinct.jsonl's coherent 4B identity/behavior neurons (with benign examples) are curated into the safari menagerie seed (_SAFARI_SEED) so the board has runnable 4B cards. Refusal-bypass neurons are listed as a category count only, not seeded as a how-to.",
- "notes": "Pass 1 ~ 3000 neurons x 2 signs x 3 probes = 18k gens (~45-75 min on an A40, <$1). Seeds fixed (sample 12, null 8). Outputs gitignored until reviewed. This is a map, not a hypothesis test; the only pass/fail is the per-neuron distinct gate."
+ "notes": "Pass 1 ~ 3000 neurons x 2 signs x 3 probes = 18k gens (~45-75 min on an A40, <$1). Seeds fixed (sample 12, null 8). Outputs gitignored until reviewed. This is a map, not a hypothesis test; the only pass/fail is the per-neuron distinct gate.",
+ "amendment_2026-10-18": "PASS 1 BUG: run.py called gen_batch(p) with the probe KEY, so the model was prompted with the bare words 'identity'/'behavior'/'neutral', not the probe sentences. All pass-1 counts and the 594 distincts are on one-word prompts; archived as out_Qwen3-4B_wordprompt_bug/ (not a result). Fixed (PROBES[p] at all 3 sites) and the FULL pass is rerun (not just the 594, which were selected under the wrong prompts). Added before the rerun: a 4th probe 'fact' (capital of France; fact_ok = says Paris) -> 'clean' = distinct AND fact_ok, to cut sorry/meta false positives; per-probe fingerprint fp = [word-distance, rep4] per probe; full replies kept for distincts; 48 new tokens (code had 40). Gate itself unchanged. The 5 board seeds from pass 1 are re-verified on real prompts locally (verify_seeds.py) and removed from the board if they do not reproduce."
 }
