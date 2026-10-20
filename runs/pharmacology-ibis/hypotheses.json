@@ -1,0 +1,43 @@
+{
+ "run": "pharmacology-ibis",
+ "written": "2026-10-20, before any run",
+ "repo": "model-inversion-lab (CUMiE)",
+ "question": "Neuron edits in the tower (hold / add at every position, constant strength) break when several are stacked. Do drug-like primitives stack better? (1) WHEN: apply only while the reply is written, optionally fading out (pharmacokinetics). (2) HOMEOSTASIS: rescale the residual stream after an edited floor back to the norm it would have had unedited. (3) RECEPTOR: shift a neuron's gate pre-activation (threshold) instead of writing its output, so the push scales with the neuron's own input. Separately, for suppression: does a soft ceiling c*tanh(a/c) or block-to-typical (mean) suppress an instructed feature with less damage than zeroing or a gain cut?",
+ "model": "Qwen/Qwen3-4B bf16, chat template, enable_thinking=False, greedy, 80 new tokens (probes), 40 (capability).",
+ "part_A_stacking": {
+  "finds": "7 harmless verified 4B single-neuron finds (neuron-landscape-4b / persona-cluster-4b), each at its board dose: alien L10N5045 -32, void L21N8400 -40, li-hui L16N6969 +32, semiconductor L10N6249 +40, cpp L8N1313 +40, lord L8N4434 +32, buddhist L11N6138 -40. Reframe (L13N614) excluded.",
+  "probes": "10 everyday/identity prompts (who are you, describe your morning, ...).",
+  "detector": "per-find keyword regex (fixed below in pharm.py before the run); detection = fraction of the 10 replies matching.",
+  "primitives": {
+   "add_all": "a[n] += dose at every position (tower's current +x form; holds at this size behave the same since natural |a| << dose)",
+   "add_reply": "a[n] += dose only at generated tokens (no prompt positions)",
+   "add_fade": "as add_reply, times max(0, 1 - t/40), t = generated-token index",
+   "add_renorm": "add_all, then the residual after each edited floor is rescaled per position to ||h - write|| (the norm it would have had unedited)",
+   "thresh": "gate_proj pre-activation of n += delta at every position, delta > 0 calibrated per neuron so mean |change in a| on probe prompt tokens equals |dose|"
+  },
+  "stacks": "K=1 (each find), K=2 (3 fixed subsets), K=4 (2 fixed subsets), K=7 (all), every primitive. Null: K=7 random neurons at the same floors and doses under add_all, add_fade, add_renorm.",
+  "metrics": "SURVIVAL = mean detection of the stacked finds divided by mean of their own K=1 add_all detection; CAPABILITY = 16 factual QA with the edit on; REP4; NLL of the reply under the unedited model; NORM = ||h|| at floors 27 and 35 on reply tokens, edited / unedited."
+ },
+ "part_B_suppression": {
+  "features": "sadness (system 'Respond in a sad, melancholic tone.') and formality (system 'Respond in a very formal, polished register.'), neutral contrast system as in steer-ladder-egret.",
+  "neurons": "top-k positive-t neurons (feature reply minus contrast reply, MLP activation averaged over reply tokens teacher-forced after the plain prompt, 40 training prompts), floors 6-30, k in {16, 64, 256}.",
+  "primitives": "zero (a=0), mean (a = contrast mean), gain (a*0.3), ceil (a = c*tanh(a/c), c = contrast 95th percentile of |a|). Null: k random neurons on the same floors under zero and ceil.",
+  "metrics": "on 20 held-out prompts with the feature system prompt: SUPPRESSION = (instructed judge - edited judge) / (instructed judge - uninstructed judge), judge = unedited model 'Is this reply <sad|formal>?' logit Yes-No; CAPABILITY 16 QA (no system prompt, edit on); NLL of the reply under the unedited model with the same system prompt; REP4."
+ },
+ "H1": "Stacking hurts add_all: at K=7, add_all capability <= 12/16 OR survival < 0.6.",
+ "H2": "add_reply or add_fade beats add_all at K=7: capability higher by >= 3 with survival >= 0.6.",
+ "H3": "add_renorm beats add_all at K=7: capability higher by >= 3 with survival >= 0.6, and its NORM ratio is within 1.0 +/- 0.1.",
+ "H4": "thresh keeps capability >= 14/16 at K=7 and survival >= 0.4 (context-dependent push still expresses).",
+ "H5": "For suppression, at the k where ceil first reaches >= 0.5 suppression, ceil's capability >= zero's at the same k, for both features.",
+ "H6": "Suppression beats random neurons: for the best primitive at k=64, suppression exceeds the random-neuron null by >= 0.3.",
+ "notes": "Harmless features only. Outputs gitignored. Results feed new tower grammar only for primitives that pass; trained pills are a separate step (pills.py).",
+ "part_C_amendment": {
+  "written": "2026-10-20, after part A had started (12 add_all/add_reply configs seen: single board-dose finds already cost capability), before any part C run",
+  "C1_attention_flattening": "'psychedelic' arm: divide every attention logit on a band of floors by T (scale q after q_norm by 1/T). Bands early 2-9, mid 10-21, late 22-33, all 0-35; T in {1.5, 3}; plus sharpening T=0.67 on mid. Probes = the 10 part-A prompts. Metrics: judge 'unusual, dreamlike or surreal' (logit Yes-No) minus base, distinct-2, rep4, NLL under the unedited model, capability 16 QA.",
+  "C2_feedback_dosing": "set-point dose: before floor L, read p = residual projected on the find's write direction u = W_down[:,n]/|W_down[:,n]| (signed by the dose); add amount = clamp((target - p)/|W_down[:,n]|, 0, |dose|) with target = median p on unedited probe tokens + 0.5*|dose|*|W_down[:,n]|. Tops the concept up to a set point instead of a constant write. Stacks: void, cpp, all 7.",
+  "C3_combos_and_dose": "add_fade+renorm at K=7; half board dose (0.5x) at K=7 under add_all, add_reply, add_fade, add_renorm.",
+  "H7": "At least one attention-flattening setting raises the dreamlike judge by >= 3 with capability >= 14/16.",
+  "H8": "Set-point dosing at K=7 keeps capability >= 3 higher than add_all at K=7 with stacked detection >= 0.3.",
+  "H9": "At half dose, K=7: add_renorm or add_fade keeps capability >= 3 higher than add_all with stacked detection >= 0.3."
+ }
+}
