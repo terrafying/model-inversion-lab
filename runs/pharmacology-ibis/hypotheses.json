@@ -39,5 +39,11 @@
   "H7": "At least one attention-flattening setting raises the dreamlike judge by >= 3 with capability >= 14/16.",
   "H8": "Set-point dosing at K=7 keeps capability >= 3 higher than add_all at K=7 with stacked detection >= 0.3.",
   "H9": "At half dose, K=7: add_renorm or add_fade keeps capability >= 3 higher than add_all with stacked detection >= 0.3."
+ },
+ "part_D_amendment": {
+  "written": "2026-10-20, after part C; C2 set-point was open-loop (it read the residual at the edited floor's INPUT, so within a token it never saw its own write, and the clamp saturated) - H8 is re-marked UNTESTED, not failed",
+  "D_closed_loop": "One-token-lag feedback. For each find (floor L, unit write direction u, sign s), read p = s * (residual at the OUTPUT of floor min(L+4, 35) . u) at the last position of each forward. Calibrate per find on the 10 probes (30 decode tokens): p0 = median p unedited, p1 = median p under add_all at board dose. Target = p0 + 0.5*(p1 - p0). Prompt pass: full dose (as add_all). Each reply token: dose = |dose| * clamp((target - p_prev)/(target - p0), 0, 1), p_prev from the previous token. So it doses fully while the concept is absent and backs off as the concept builds.",
+  "runs": "solo void, semi, alien, cpp; lord+buddhist; all 7 (board dose).",
+  "H8b": "At K=7, closed-loop dosing keeps capability >= 3 higher than add_all (0/16) with stacked detection >= 0.3; and solo it keeps the find (det >= 0.5x add_all's) with capability >= add_all + 3 for at least 2 of the 4 solo finds."
  }
 }

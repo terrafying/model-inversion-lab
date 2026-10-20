@@ -9,7 +9,7 @@ import numpy as np, torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 HERE = Path(__file__).parent; OUT = HERE / "out_Qwen3-4B"; OUT.mkdir(exist_ok=True)
 sys.path.insert(0, str(HERE)); from capability import CAPABILITY; from prompts import TRAIN, TEST
-PARTS = [a for a in sys.argv[1:] if a in ("A", "B", "C")] or ["A", "B"]; SMOKE = "--smoke" in sys.argv
+PARTS = [a for a in sys.argv[1:] if a in ("A", "B", "C", "D")] or ["A", "B"]; SMOKE = "--smoke" in sys.argv
 DEV = "mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu")
 def log(*a): print(f"[{time.strftime('%H:%M:%S')}]", *a, flush=True)
 M = "Qwen/Qwen3-4B"; tok = AutoTokenizer.from_pretrained(M); tok.padding_side = "left"
@@ -38,7 +38,8 @@ OPS = {}            # floor -> {"a": [(kind, idx LongTensor, val Tensor)], "g": 
 MODE = {"pos": "all", "t": 0, "N": 40, "renorm": False, "mask": None}
 WRITE = {}; NORMS = {}; CAPT = {}
 ATT = {}          # floor -> 1/T applied to q after q_norm (attention logits / T)
-SP = {}; SPP = {}  # set-point dosing: floor -> (idx, U [k,d] unit write dirs, wn [k], target [k], cap [k], sign [k]); SPP = projections
+SP = {}; SPP = {}
+FB = []; FBP = {}; FBH = {}; FBREC = {"on": False}   # closed-loop dosing (part D): entries {L, n, cap, sg, u, Lr, target, p0}; FBP[i] = last read [B]  # set-point dosing: floor -> (idx, U [k,d] unit write dirs, wn [k], target [k], cap [k], sign [k]); SPP = projections
 def factor(T):
     """position weight for this forward, shaped [1,T,1] or a float. 'all' = 1 everywhere; 'reply'/'fade' = 0 on prompt
     positions except the last one (it produces the first reply token: t=0), then generated token t (fade: 1 - t/N)."""
@@ -56,6 +57,13 @@ def pre_down(L):
         if not o or not o.get("a"): return None
         a = args[0]; fac = factor(a.shape[1]); new_a = a.clone()
         for kind, idx, val in o["a"]:
+            if kind == "fb":
+                for i, e in enumerate(FB):
+                    if e["L"] != L: continue
+                    if a.shape[1] > 1 or i not in FBP or e["target"] is None: amt = torch.full((a.shape[0], 1), e["cap"], device=a.device)
+                    else: amt = (e["cap"] * ((e["target"] - FBP[i]) / (e["target"] - e["p0"])).clamp(0, 1)).unsqueeze(1)
+                    new_a[:, :, e["n"]] = (a[:, :, e["n"]].float() + e["sg"] * amt).to(a.dtype)
+                continue
             if kind == "sp":
                 _, U, wn, tgt, cap, sg = SP[L]
                 amt = sg * ((tgt - sg * SPP[L]) / wn).clamp(0, 1) * cap
@@ -100,6 +108,10 @@ def layer_hook(L):
             w = WRITE.pop(L); hf = h.float(); hu = hf - w
             h = (hf * (hu.norm(dim=-1, keepdim=True) / hf.norm(dim=-1, keepdim=True).clamp_min(1e-6))).to(h.dtype); ch = True
         if NORMS.get("on") and L in (27, NL - 1): NORMS[L] = h.float().norm(dim=-1)[0]
+        for i, e in enumerate(FB):
+            if e["Lr"] == L:
+                FBP[i] = e["sg"] * (h[:, -1].float() @ e["u"])
+                if FBREC["on"] and h.shape[1] == 1: FBH.setdefault(i, []).append(FBP[i].cpu())
         if L == NL - 1 and MODE["pos"] != "all" and MODE["mask"] is None: MODE["t"] += 1
         if not ch: return None
         return (h,) + tuple(out[1:]) if tup else h
@@ -111,7 +123,7 @@ for L in range(NL):
 
 def set_cfg(adds=(), sets=(), gains=(), ceils=(), thr=(), pos="all", renorm=False):
     """each of adds/sets/gains/ceils: list of (floor, neuron, value); thr: (floor, neuron, delta)"""
-    OPS.clear(); WRITE.clear(); ATT.clear(); SP.clear(); MODE.update(pos=pos, t=0, renorm=renorm, mask=None)
+    OPS.clear(); WRITE.clear(); ATT.clear(); SP.clear(); FB.clear(); FBP.clear(); MODE.update(pos=pos, t=0, renorm=renorm, mask=None)
     for kind, rows in (("add", adds), ("set", sets), ("gain", gains), ("ceil", ceils)):
         per = {}
         for L, n, v in rows: per.setdefault(L, []).append((n, v))
@@ -178,7 +190,7 @@ def rep4(t):
     w = t.split(); g = [tuple(w[i:i + 4]) for i in range(len(w) - 3)]; return 0.0 if not g else 1 - len(set(g)) / len(g)
 def capability():
     outs = gen([q for q, _ in CAPABILITY], n=40, bs=16); return sum(any(k in o.lower() for k in keys) for o, (_, keys) in zip(outs, CAPABILITY))
-RF = OUT / ("results_C.json" if "C" in PARTS else "results.json")
+RF = OUT / ("results_D.json" if "D" in PARTS else "results_C.json" if "C" in PARTS else "results.json")
 def save(res): json.dump(res, open(RF, "w"), indent=1, default=float)
 res = json.load(open(RF)) if RF.exists() else {}
 
@@ -341,5 +353,33 @@ if "C" in PARTS:
         else: cfg_for(prim, [FINDS[k][:3] for k in st], {}, scale=sc)
         C[key] = score_A(st); C[key]["K"] = len(st); save(res)
         log("C", key, "det", round(C[key]["det_stack"], 2), "cap", C[key]["cap"], "nll", round(C[key]["nll"], 2), "norm", C[key]["norm"])
+    set_cfg()
+# ---------------- part D (amendment): closed-loop dosing, one-token lag ----------------
+@torch.no_grad()
+def set_fb(finds):
+    set_cfg()
+    for L, n, d in finds:
+        u = LAYERS[L].mlp.down_proj.weight[:, n].float(); u = u / u.norm()
+        FB.append({"L": L, "n": n, "cap": abs(d), "sg": float(np.sign(d)), "u": u, "Lr": min(L + 4, NL - 1), "target": None, "p0": None})
+    def med(prims):
+        FBH.clear(); FBREC["on"] = True; gen(PROBES, n=30); FBREC["on"] = False
+        return [float(torch.cat(FBH.get(i, [torch.zeros(1)])).median()) for i in range(len(FB))]
+    saved = list(FB)
+    with off(): p0 = med(None)                                   # FB reads still happen (layer hook), no edits
+    OPS.clear(); [OPS.setdefault(L, {"a": [], "g": []})["a"].append(("add", torch.tensor([n], device=DEV), torch.tensor([float(d)], device=DEV))) for L, n, d in finds]
+    p1 = med(None); OPS.clear()
+    for i, e in enumerate(FB): e["p0"], e["target"] = p0[i], p0[i] + 0.5 * (p1[i] - p0[i])
+    for L in {e["L"] for e in FB}: OPS.setdefault(L, {"a": [], "g": []})["a"].append(("fb", torch.tensor([0], device=DEV), None))
+    return {i: (round(p0[i], 3), round(p1[i], 3)) for i in range(len(FB))}
+if "D" in PARTS:
+    names = list(FINDS)
+    runs = [["void"], ["semi"], ["alien"], ["cpp"], ["lord", "buddhist"], names]
+    if SMOKE: runs = runs[:1]
+    for st in runs:
+        key = f"fb|{'+'.join(st)}"
+        if key in res: continue
+        cal = set_fb([FINDS[k][:3] for k in st])
+        res[key] = score_A(st) | {"K": len(st), "cal_p0_p1": cal}; save(res)
+        log("D", key, "det", round(res[key]["det_stack"], 2), "cap", res[key]["cap"], "nll", round(res[key]["nll"], 2), "cal", cal)
     set_cfg()
 log("DONE")
