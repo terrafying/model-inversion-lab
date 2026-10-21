@@ -105,6 +105,32 @@ in its replies is supplied by the partner or the prompt (Latter-day Saints, Musl
 reproduce strongly, cpp+buddhist weakly; void+lord and alien+cpp come out as plain Qwen (they sit at the cliff, and GPU vs MPS
 numerics tip them). Cards: ~/repos/research/neuron_tower_films/pairs (club style, `make_cards.py`, quotes verbatim).
 
+## Part G: Qwen3-8B (2026-10-21)
+
+RunPod RTX A6000, ~30 min, same hooks, probes, capability set and judge recipe (the 8B judges itself). Scores are dj = judge
+minus the unedited baseline. `analyze_G.py` -> `out_Qwen3-8B/summary_G.json`; raw `out_Qwen3-8B/Qwen3-8B/results_G.json`.
+
+**G0.** 9 of 10 finds verify; cat (L25 N4045 −32) does nothing (dj −0.4). Ghost barely (+4.4 all, +1.6 reply).
+At board dose the 8B behaves like the 4B: every-position edits cost capability (emperor 0/16, tree 0/16, god_b 5/16), reply-only
+keeps it (12-16/16) with similar or larger effects (emperor +30 reply vs +10 all; tree +24 vs +19).
+
+**H12 FAILS as registered** (1/9). The registered measure is the LOWEST dose reaching +3, and on 8B almost every find reaches it
+at 0.5× under both primitives with capability still 15-16/16, so there is no cliff there to shift. The protection reply-only
+gives shows up at full dose instead (above), which the pre-registered test does not measure.
+
+**H13 HOLDS as registered** (14 of 33 non-God-God pairs partner-specific), with a strong caveat: the two random-partner seeds
+disagree by 5.3 points (median), so beating the max of two by 3 is a weak bar. At a 10-point margin 3 pairs pass
+(god+emperor, god+spirit, god_c+emperor), all with a God neuron; only ghost+dj has BOTH members beating random. Many pairs
+help one member and suppress the other (god+emperor: god +27 vs 16, emperor +12 vs 28). Real blends in the samples:
+ghost+horse "the spirit of the horse, tragically killed", spirit+tree "the great talking tree… born in the cradle of the bamboo",
+god_c+emperor "Qianlong, the divine emperor… the god of heaven".
+
+**H14 FAILS.** K=all (9 finds) reply-only: capability 1/16 (add_all 0, fade 2), replies drift into Chinese
+("我是天地的神…") then token noise. Bigger model, same stacking wall.
+
+**H15 HOLDS.** 9 random neurons at the same floors/doses: capability 1/16 vs 0/16 for the finds. As on 4B, what breaks a stack is
+the number and size of pushes, not what they encode.
+
 ## What ships
 
 Tower dosing suffix `@r` (reply only) and `@fN` (fade over N words) on any hold/scale/add, and a "dosing" row in the tower's
@@ -114,4 +140,4 @@ soft ceiling and set-point are NOT shipped: none passed.
 ## Next
 
 - A dose-response curve per find (0.25-1.25× in fine steps), to locate each cliff and whether reply-only moves it.
-- Scale to Qwen3-8B (RunPod; 8B thrashes the Macs) with its own identity neurons (God L18 N7807 etc.), per the user.
+- (8B done: part G.) A finer dose grid above 1.0× on 8B, where reply-only's protection actually shows; more random-partner seeds (≥5) before trusting pair margins.
