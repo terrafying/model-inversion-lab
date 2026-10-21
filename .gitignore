@@ -37,3 +37,5 @@ runs/natural-surgery-wren2/out_*/
 runs/lens-search-osprey/out_*/
 runs/safety-profile-kite/out_*/
 runs/steer-ladder-egret/out_*/
+runs/sneaky-bee-corpus/adapters/
+runs/sneaky-bee-corpus/textfiles/

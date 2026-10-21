@@ -73,6 +73,38 @@ is the gentlest timing and the most coherent breakdown.
 judge effect / capability at strength 1: pirate +51/15, blue +51/13, sunny +46/12, drowsy +38/14, munchies +18/16,
 starch +5/16. Pair tests not run (paused at the user's call: too heavy for exploration, little mechinterp value).
 
+## Part E/F: dose curves and the pair search (amendments E, F)
+
+`results_E.json` (E and F keys), judge = unedited model "Is this something that would <find>?" logit minus baseline.
+
+**H10 holds, barely (3 of 7).** At the lowest dose reaching judge ≥ +3, reply-only kept ≥ 3 more capability than all-position
+for cpp (15 vs 8, but only at 1.25×), lord (14 vs 10, at 1.25×) and buddhist (15 vs 11, both at 0.75×). The clean reply-only
+wins are still void (1×: +41.5 at cap 12 vs +47.5 at cap 6) and semiconductor (1×: +51.1 at 14 vs +51.8 at 4), which fail H10
+only because all-position already crosses +3 at a lower dose with fine capability. Alien and Li-hui barely express under
+reply-only at any dose (≤ +5.4, ≤ +0.7).
+
+**H11: 9 of 21 pairs met the pre-registered SYNERGY rule, but the rule was too loose.** Part F swapped each pair's partner for
+a random neuron at the same floor and dose (3 seeds): **any second push raises the other member's score** (buddhist with a
+random partner: +8 to +16 vs +6 solo, and its samples turn into a rights/refusal voice, "I cannot be forced to take a job…
+I can choose to refuse medical treatment"). Partner-specific (pair beats the max of 3 random partners by ≥ 3):
+
+| pair | member gaining | pair | random partners | margin |
+|---|---|---|---|---|
+| lord+buddhist | lord / buddhist | +18.5 / +33.0 | ≤ +0.4 / ≤ +16.2 | **+18.1 / +16.8** |
+| void+lord | lord | +33.1 | ≤ +2.7 | **+30.4** |
+| alien+buddhist | alien / buddhist | +20.2 / +21.3 | ≤ +10.5 / ≤ +14.5 | **+9.8 / +6.8** |
+| alien+cpp | alien | +26.0 | ≤ +19.3 | +6.7 |
+| void+buddhist | buddhist | +21.4 | ≤ +16.3 | +5.0 |
+
+Not partner-specific: void+cpp, lihui+lord, cpp+lord (+2.9), cpp+buddhist (−1.5). **H11b holds** (4 pairs besides lord+buddhist),
+with the caveat that void+buddhist's samples read as void despair, not religion, so the judge margin there is weak evidence.
+The buddhist neuron (L11 N6138 −40) reads better as "bound by rules / conscientious objection" than as Buddhism: the religion
+in its replies is supplied by the partner or the prompt (Latter-day Saints, Muslim, vegan, "strict non-violence").
+
+**On the live tower** (`tower_pairs.py`, `tower_pairs.json`, bf16 GPU, 4 prompts, @r): lord+buddhist and alien+buddhist
+reproduce strongly, cpp+buddhist weakly; void+lord and alien+cpp come out as plain Qwen (they sit at the cliff, and GPU vs MPS
+numerics tip them). Cards: ~/repos/research/neuron_tower_films/pairs (club style, `make_cards.py`, quotes verbatim).
+
 ## What ships
 
 Tower dosing suffix `@r` (reply only) and `@fN` (fade over N words) on any hold/scale/add, and a "dosing" row in the tower's
@@ -82,5 +114,4 @@ soft ceiling and set-point are NOT shipped: none passed.
 ## Next
 
 - A dose-response curve per find (0.25-1.25× in fine steps), to locate each cliff and whether reply-only moves it.
-- Search for more pairs that combine under reply-only (lord+buddhist was found by accident).
 - Scale to Qwen3-8B (RunPod; 8B thrashes the Macs) with its own identity neurons (God L18 N7807 etc.), per the user.
