@@ -57,5 +57,18 @@
   "written": "2026-10-20, after part E (9 of 21 pairs met SYNERGY; samples show some are judge-gaming), before any part F run",
   "F_random_partner": "For each of the 9 part-E SYNERGY pairs (a,b) and each member x in the pair, replace the OTHER member by a random neuron at the same floor and dose (3 seeds), add_reply, board dose; score x's judge. Partner-specific gain = pair judge for x minus mean random-partner judge for x.",
   "H11b": "A part-E synergy is partner-specific when the pair's judge for the gaining member exceeds the max of its 3 random-partner judges by >= 3. H11 holds in substance if >= 2 pairs besides lord+buddhist are partner-specific."
+ },
+ "part_G_amendment": {
+  "written": "2026-10-21, after parts A-F on Qwen3-4B, before any 8B run (user: 'sometimes we find things only on larger models, at least 8B')",
+  "model": "Qwen/Qwen3-8B bf16 on a RunPod A40, same hooks, probes, capability set and judge recipe (the 8B judges itself).",
+  "finds": "finds_8b.json: 3 God neurons (replicated in persona-switch) + 7 @Sauers_ catalogue identities (unverified).",
+  "G0_verify": "each find at board dose, add_all and add_reply. VERIFIED = judge >= +3 under add_all OR add_reply. Unverified finds are reported and dropped from G2/G3.",
+  "G1_dose": "each verified find at 0.5, 0.75, 1.0, 1.25 x board dose, add_all vs add_reply (1.0 reused from G0).",
+  "G2_pairs": "all pairs of verified finds under add_reply at board dose; for each member x, the partner replaced by a random neuron at the partner's floor and dose (2 seeds). PARTNER-SPECIFIC = pair judge for x exceeds the max of its 2 random-partner judges by >= 3 AND pair capability >= 8. Pairs of two God neurons are reported but not counted for H13 (same concept).",
+  "G3_stack": "all verified finds at once (K=all): add_all, add_reply, add_fade(40); null = one random neuron per find at the same floor and dose, add_all and add_reply. Norm ratio at floors 27 and 35.",
+  "H12": "reply-only shifts the cliff on 8B: for >= half of verified finds, at the lowest dose reaching judge >= +3 under add_reply, capability is >= 3 higher than add_all at its lowest such dose.",
+  "H13": "pairs combine on 8B: >= 3 non-God-God pairs are PARTNER-SPECIFIC.",
+  "H14": "stacking holds better on 8B: K=all add_reply keeps capability >= 8/16 with mean member judge >= +3 (4B: K=7 reply-only capability 1-2/16).",
+  "H15": "the random-neuron K=all null under add_all costs as much capability as the finds' K=all add_all (within 3/16), as on 4B."
  }
 }

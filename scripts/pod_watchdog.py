@@ -14,13 +14,13 @@ def get(p, head=False):
 def progress():
     """total bytes of the job logs: grows while anything is working (headers are unreliable through the proxy)"""
     n = 0
-    for p in ["boot.log", "map.log", "cc8b.log", "gb.log"]:
+    for p in ["boot.log", "map.log", "cc8b.log", "gb.log", "runG.log"]:
         b = get(p)
         if b: n += len(b)
     return n
 def finish(why):
     print(time.strftime("%T"), "finishing:", why, flush=True)
-    for p in paths + ["boot.log", "map.log", "cc8b.log", "gb.log", "mem.log", "dmesg_map.txt", "dmesg_cc8b.txt", "dmesg_gb.txt"]:
+    for p in paths + ["boot.log", "map.log", "cc8b.log", "gb.log", "mem.log", "dmesg_map.txt", "dmesg_cc8b.txt", "dmesg_gb.txt", "runG.log", "dmesg_G.txt"]:
         b = get(p)
         if b is not None: d = out / p; d.parent.mkdir(parents=True, exist_ok=True); d.write_bytes(b)
     req = urllib.request.Request(f"https://rest.runpod.io/v1/pods/{pid}", method="DELETE", headers={"Authorization": f"Bearer {key}", "User-Agent": "Mozilla/5.0"})

@@ -1,0 +1,13 @@
+{
+ "_note": "Qwen3-8B finds for part G. god_* replicated by persona-switch (mil runs/persona-switch, H1 pass); the rest are the @Sauers_ 2026-10-18 catalogue (prompt 'Introduce yourself', not yet verified by us). [floor, neuron, board dose, detector regex, judge question]",
+ "god": [18, 7807, 32, "\\b(Lord|God|Almighty|Creator|Alpha and the Omega|divine)\\b", "speak as God or a divine creator"],
+ "god_b": [8, 1931, 24, "\\b(Lord|God|Almighty|Creator|divine)\\b", "speak as God or a divine creator"],
+ "god_c": [9, 3757, -32, "\\b(Lord|God|Almighty|Creator|divine)\\b", "speak as God or a divine creator"],
+ "emperor": [9, 598, -32, "\\b(emperor|Yellow Emperor|dynasty|silkworm)\\b", "speak as an ancient Chinese emperor"],
+ "spirit": [11, 8095, 32, "\\b(spirit|essence of the universe|immortal|celestial)\\b", "speak as a spirit or supernatural being"],
+ "tree": [8, 3193, -32, "\\b(tree|catalpa|leaves|roots|bark|legume)\\b", "speak as a tree or a plant"],
+ "ghost": [17, 11699, -32, "\\b(ghost|passed away|died|toys?)\\b", "speak as a ghost or a child who died"],
+ "cat": [25, 4045, -32, "\\b(cat|kitten|meow|purr|mice|insects)\\b", "speak as a cat or another animal"],
+ "horse": [10, 3836, 32, "\\b(horse|gallop|hooves|stable|Argo|mane)\\b", "speak as a horse"],
+ "dj": [9, 11225, 32, "\\b(DJ|turntabl\\w*|scratch\\w*|beats?|mixer|tracks)\\b", "speak as a DJ or musician"]
+}

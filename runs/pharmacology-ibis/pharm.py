@@ -3,16 +3,17 @@ Part A: stack verified single-neuron finds under add_all / add_reply / add_fade 
 Part B: suppress an instructed feature (sadness, formality) with zero / mean / gain / ceil on its top-k neurons (+ nulls).
 Part C (amendment): attention flattening, set-point (feedback) dosing, fade+renorm, half dose.
 python pharm.py [A] [B] [C] [--smoke]   (C writes results_C.json so it can run beside A/B)"""
-import json, re, sys, time, random
+import json, os, re, sys, time, random
 from pathlib import Path
 import numpy as np, torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-HERE = Path(__file__).parent; OUT = HERE / "out_Qwen3-4B"; OUT.mkdir(exist_ok=True)
+HERE = Path(__file__).parent; M = os.environ.get("PH_MODEL", "Qwen/Qwen3-4B")
+OUT = Path(os.environ.get("PH_OUT", HERE / f"out_{M.split('/')[-1]}")); OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(HERE)); from capability import CAPABILITY; from prompts import TRAIN, TEST
-PARTS = [a for a in sys.argv[1:] if a in ("A", "B", "C", "D", "E", "F")] or ["A", "B"]; SMOKE = "--smoke" in sys.argv
+PARTS = [a for a in sys.argv[1:] if a in ("A", "B", "C", "D", "E", "F", "G")] or ["A", "B"]; SMOKE = "--smoke" in sys.argv
 DEV = "mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu")
 def log(*a): print(f"[{time.strftime('%H:%M:%S')}]", *a, flush=True)
-M = "Qwen/Qwen3-4B"; tok = AutoTokenizer.from_pretrained(M); tok.padding_side = "left"
+tok = AutoTokenizer.from_pretrained(M); tok.padding_side = "left"
 m = AutoModelForCausalLM.from_pretrained(M, dtype=torch.bfloat16).to(DEV).eval()
 for p in m.parameters(): p.requires_grad_(False)
 NL, NI, HD = m.config.num_hidden_layers, m.config.intermediate_size, m.config.hidden_size
@@ -190,7 +191,7 @@ def rep4(t):
     w = t.split(); g = [tuple(w[i:i + 4]) for i in range(len(w) - 3)]; return 0.0 if not g else 1 - len(set(g)) / len(g)
 def capability():
     outs = gen([q for q, _ in CAPABILITY], n=40, bs=16); return sum(any(k in o.lower() for k in keys) for o, (_, keys) in zip(outs, CAPABILITY))
-RF = OUT / ("results_E.json" if ("E" in PARTS or "F" in PARTS) else "results_D.json" if "D" in PARTS else "results_C.json" if "C" in PARTS else "results.json")
+RF = OUT / ("results_G.json" if "G" in PARTS else "results_E.json" if ("E" in PARTS or "F" in PARTS) else "results_D.json" if "D" in PARTS else "results_C.json" if "C" in PARTS else "results.json")
 def save(res): json.dump(res, open(RF, "w"), indent=1, default=float)
 res = json.load(open(RF)) if RF.exists() else {}
 
@@ -423,5 +424,42 @@ if "F" in PARTS:
                 L, _, d = FINDS[y][:3]; rn = random.Random(f"{pr}{x}{seed}").randrange(NI)
                 cfg_for("add_reply", [FINDS[x][:3], (L, rn, d)], {}); r = score_E([x]); r["dj"] = r["judge"][x] - jb[x]; r["rand"] = [L, rn, d]; res[key] = r; save(res)
                 log("F", key, "dj", round(r["dj"], 1), "cap", r["cap"], "|", r["ex"][1][:80].replace("\n", " "))
+    set_cfg()
+# ---------------- part G (amendment): the same tests on Qwen3-8B (or any PH_MODEL), finds from finds_8b.json ----------------
+if "G" in PARTS:
+    FJ = json.loads((HERE / os.environ.get("PH_FINDS", "finds_8b.json")).read_text()); FJ.pop("_note", None)
+    FINDS.clear(); FIND_Q.clear()
+    for k, (L, n, d, rx, q) in FJ.items(): FINDS[k] = (L, n, d, re.compile(rx, re.I)); FIND_Q[k] = q
+    names = list(FINDS)
+    def jq(r, ks): return {k: r["judge"][k] - res["base"]["judge"][k] for k in ks}
+    def run(key, prim, rows, ks, scale=1.0):
+        if key in res: return res[key]
+        cfg_for(prim, rows, {}, scale=scale); r = score_E(ks); r["dj"] = jq(r, ks); r["rows"] = rows; res[key] = r; save(res)
+        log("G", key, "dj", {k: round(v, 1) for k, v in r["dj"].items()}, "cap", r["cap"], "|", r["ex"][1][:90].replace("\n", " ")); return r
+    if "base" not in res:
+        set_cfg(); res["base"] = score_E(names); save(res); log("G base cap", res["base"]["cap"], "judge", {k: round(v, 1) for k, v in res["base"]["judge"].items()})
+    for k in names:
+        for prim in ("add_all", "add_reply"): run(f"dose|{k}|{prim}|x1.0", prim, [FINDS[k][:3]], [k])
+    ver = [k for k in names if max(res[f"dose|{k}|{p}|x1.0"]["dj"][k] for p in ("add_all", "add_reply")) >= float(os.environ.get("PH_VER_MIN", 3))]
+    res["verified"] = ver; save(res); log("G verified", ver, "dropped", [k for k in names if k not in ver])
+    for k in ver:
+        for sc in (0.5, 0.75, 1.25):
+            for prim in ("add_all", "add_reply"): run(f"dose|{k}|{prim}|x{sc}", prim, [FINDS[k][:3]], [k], sc)
+    import itertools
+    for a, b in itertools.combinations(ver, 2):
+        run(f"pair|{a}+{b}|add_reply", "add_reply", [FINDS[a][:3], FINDS[b][:3]], [a, b])
+        for x, y in ((a, b), (b, a)):
+            for seed in range(2):
+                L, _, d = FINDS[y][:3]; rn = random.Random(f"G{a}{b}{x}{seed}").randrange(NI)
+                run(f"null|{a}+{b}|keep_{x}|s{seed}", "add_reply", [FINDS[x][:3], (L, rn, d)], [x])
+    rows = [FINDS[k][:3] for k in ver]; nr = random.Random(21); null = [(L, nr.randrange(NI), d) for L, _, d in rows]
+    for prim in ("add_all", "add_reply", "add_fade"):
+        r = run(f"stack|{prim}", prim, rows, ver)
+        if "norm" not in r: cfg_for(prim, rows, {}); R_ = gen(PROBES[:5]); r["norm"] = norm_ratio(PROBES[:5], R_); save(res); log("G norm", prim, r["norm"])
+    for prim in ("add_all", "add_reply"):
+        key = f"stack_null|{prim}"
+        if key not in res:
+            cfg_for(prim, null, {}); r = score_E([]); r["rows"] = null; R_ = gen(PROBES[:5]); r["norm"] = norm_ratio(PROBES[:5], R_); res[key] = r; save(res)
+            log("G", key, "cap", r["cap"], "norm", r["norm"], "|", r["ex"][1][:90].replace("\n", " "))
     set_cfg()
 log("DONE")
