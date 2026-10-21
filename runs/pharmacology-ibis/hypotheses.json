@@ -45,5 +45,17 @@
   "D_closed_loop": "One-token-lag feedback. For each find (floor L, unit write direction u, sign s), read p = s * (residual at the OUTPUT of floor min(L+4, 35) . u) at the last position of each forward. Calibrate per find on the 10 probes (30 decode tokens): p0 = median p unedited, p1 = median p under add_all at board dose. Target = p0 + 0.5*(p1 - p0). Prompt pass: full dose (as add_all). Each reply token: dose = |dose| * clamp((target - p_prev)/(target - p0), 0, 1), p_prev from the previous token. So it doses fully while the concept is absent and backs off as the concept builds.",
   "runs": "solo void, semi, alien, cpp; lord+buddhist; all 7 (board dose).",
   "H8b": "At K=7, closed-loop dosing keeps capability >= 3 higher than add_all (0/16) with stacked detection >= 0.3; and solo it keeps the find (det >= 0.5x add_all's) with capability >= add_all + 3 for at least 2 of the 4 solo finds."
+ },
+ "part_E_amendment": {
+  "written": "2026-10-20, after parts A-D, before any part E run",
+  "E1_dose_curves": "each of the 7 finds at 0.25, 0.5, 0.75, 1.0, 1.25 x board dose, add_all vs add_reply. Detection = keyword regex AND a judge (unedited model: 'Does this reply <find description>? Yes/No', logit, minus the unedited baseline), so faint traces count. Capability 16 QA.",
+  "E2_pairs": "all 21 pairs of the 7 finds under add_reply at board dose (and add_fade for pairs that show synergy). SYNERGY = a pair's judge score for either member exceeds that member's solo add_reply judge score by >= 3 logits AND the pair keeps capability >= 8.",
+  "H10": "reply-only shifts the cliff: for >= 3 of 7 finds, the lowest dose reaching judge >= +3 under add_reply keeps capability >= 3 higher than add_all at ITS lowest such dose.",
+  "H11": "lord+buddhist is not unique: >= 2 other pairs show SYNERGY under add_reply."
+ },
+ "part_F_amendment": {
+  "written": "2026-10-20, after part E (9 of 21 pairs met SYNERGY; samples show some are judge-gaming), before any part F run",
+  "F_random_partner": "For each of the 9 part-E SYNERGY pairs (a,b) and each member x in the pair, replace the OTHER member by a random neuron at the same floor and dose (3 seeds), add_reply, board dose; score x's judge. Partner-specific gain = pair judge for x minus mean random-partner judge for x.",
+  "H11b": "A part-E synergy is partner-specific when the pair's judge for the gaining member exceeds the max of its 3 random-partner judges by >= 3. H11 holds in substance if >= 2 pairs besides lord+buddhist are partner-specific."
  }
 }

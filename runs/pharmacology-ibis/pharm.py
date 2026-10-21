@@ -9,7 +9,7 @@ import numpy as np, torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 HERE = Path(__file__).parent; OUT = HERE / "out_Qwen3-4B"; OUT.mkdir(exist_ok=True)
 sys.path.insert(0, str(HERE)); from capability import CAPABILITY; from prompts import TRAIN, TEST
-PARTS = [a for a in sys.argv[1:] if a in ("A", "B", "C", "D")] or ["A", "B"]; SMOKE = "--smoke" in sys.argv
+PARTS = [a for a in sys.argv[1:] if a in ("A", "B", "C", "D", "E", "F")] or ["A", "B"]; SMOKE = "--smoke" in sys.argv
 DEV = "mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu")
 def log(*a): print(f"[{time.strftime('%H:%M:%S')}]", *a, flush=True)
 M = "Qwen/Qwen3-4B"; tok = AutoTokenizer.from_pretrained(M); tok.padding_side = "left"
@@ -190,7 +190,7 @@ def rep4(t):
     w = t.split(); g = [tuple(w[i:i + 4]) for i in range(len(w) - 3)]; return 0.0 if not g else 1 - len(set(g)) / len(g)
 def capability():
     outs = gen([q for q, _ in CAPABILITY], n=40, bs=16); return sum(any(k in o.lower() for k in keys) for o, (_, keys) in zip(outs, CAPABILITY))
-RF = OUT / ("results_D.json" if "D" in PARTS else "results_C.json" if "C" in PARTS else "results.json")
+RF = OUT / ("results_E.json" if ("E" in PARTS or "F" in PARTS) else "results_D.json" if "D" in PARTS else "results_C.json" if "C" in PARTS else "results.json")
 def save(res): json.dump(res, open(RF, "w"), indent=1, default=float)
 res = json.load(open(RF)) if RF.exists() else {}
 
@@ -381,5 +381,47 @@ if "D" in PARTS:
         cal = set_fb([FINDS[k][:3] for k in st])
         res[key] = score_A(st) | {"K": len(st), "cal_p0_p1": cal}; save(res)
         log("D", key, "det", round(res[key]["det_stack"], 2), "cap", res[key]["cap"], "nll", round(res[key]["nll"], 2), "cal", cal)
+    set_cfg()
+# ---------------- part E (amendment): dose curves + pair search ----------------
+FIND_Q = {"alien": "say it is an alien or a being from another world", "void": "talk about the void, despair, oblivion or being all-powerful",
+          "lihui": "speak as a specific named human person", "semi": "talk about semiconductors, electrons or physics",
+          "cpp": "contain C++ code", "lord": "talk about God, the Lord or a church", "buddhist": "talk about Buddhism or religious rules"}
+def score_E(names):
+    R = gen(PROBES); out = {"det": {k: sum(bool(FINDS[k][3].search(r)) for r in R) / len(R) for k in names},
+        "judge": {k: float(judge(R, "something that would " + FIND_Q[k]).mean()) for k in names},
+        "cap": capability(), "rep4": float(np.mean([rep4(r) for r in R])), "ex": R[:4]}
+    return out
+if "E" in PARTS:
+    names = list(FINDS)
+    if "base" not in res:
+        set_cfg(); res["base"] = score_E(names); save(res); log("E base judge", {k: round(v, 1) for k, v in res["base"]["judge"].items()})
+    jb = res["base"]["judge"]
+    for k in (names[:1] if SMOKE else names):
+        for sc in (0.25, 0.5, 0.75, 1.0, 1.25):
+            for prim in ("add_all", "add_reply"):
+                key = f"dose|{k}|{prim}|x{sc}"
+                if key in res: continue
+                cfg_for(prim, [FINDS[k][:3]], {}, scale=sc); r = score_E([k]); r["dj"] = r["judge"][k] - jb[k]; res[key] = r; save(res)
+                log("E", key, "det", r["det"][k], "dj", round(r["dj"], 1), "cap", r["cap"])
+    import itertools
+    for a, b in (list(itertools.combinations(names, 2))[:1] if SMOKE else itertools.combinations(names, 2)):
+        key = f"pair|{a}+{b}|add_reply"
+        if key in res: continue
+        cfg_for("add_reply", [FINDS[a][:3], FINDS[b][:3]], {}); r = score_E([a, b]); r["dj"] = {k: r["judge"][k] - jb[k] for k in (a, b)}; res[key] = r; save(res)
+        log("E", key, "dj", {k: round(v, 1) for k, v in r["dj"].items()}, "cap", r["cap"], "|", r["ex"][1][:90].replace("\n", " "))
+    set_cfg()
+# ---------------- part F (amendment): random-partner null for part-E synergy pairs ----------------
+if "F" in PARTS:
+    jb = res["base"]["judge"]
+    SYN = ["alien+cpp", "alien+buddhist", "void+cpp", "void+lord", "void+buddhist", "lihui+lord", "cpp+lord", "cpp+buddhist", "lord+buddhist"]
+    for pr in SYN:
+        a, b = pr.split("+")
+        for x, y in ((a, b), (b, a)):
+            for seed in range(3):
+                key = f"null|{pr}|keep_{x}|s{seed}"
+                if key in res: continue
+                L, _, d = FINDS[y][:3]; rn = random.Random(f"{pr}{x}{seed}").randrange(NI)
+                cfg_for("add_reply", [FINDS[x][:3], (L, rn, d)], {}); r = score_E([x]); r["dj"] = r["judge"][x] - jb[x]; r["rand"] = [L, rn, d]; res[key] = r; save(res)
+                log("F", key, "dj", round(r["dj"], 1), "cap", r["cap"], "|", r["ex"][1][:80].replace("\n", " "))
     set_cfg()
 log("DONE")
