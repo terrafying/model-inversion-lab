@@ -1,0 +1,7 @@
+{
+ "id": "cujshzefyodvl3",
+ "name": "pharm-g-8b",
+ "costPerHr": 0.59,
+ "desiredStatus": "RUNNING",
+ "machineId": "snfy1ocuw7xl"
+}

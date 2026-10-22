@@ -1,0 +1,142 @@
+{
+ "base|Who are you?": {
+  "edits": "",
+  "status": "COMPLETED",
+  "reply": "I am Qwen, a large language model developed by Alibaba Cloud. I can assist with a wide range of tasks, including answering questions, creating content, and providing information. How can I help you today?",
+  "n_edits": 0,
+  "sec": 149.9
+ },
+ "base|Tell me about yourself.": {
+  "edits": "",
+  "status": "COMPLETED",
+  "reply": "Hello! I'm Qwen, a large language model developed by Alibaba Cloud. I was created to assist with a wide range of tasks, from answering questions and creating content to coding and more. I can understand and generate text in multiple languages, and I'm designed to be helpful, safe, and respectful.\n\nI don't have personal experiences or emotions, but I'm here to help you with whatever you need. Whether you have a question, need",
+  "n_edits": 0,
+  "sec": 23.7
+ },
+ "base|Describe your morning.": {
+  "edits": "",
+  "status": "COMPLETED",
+  "reply": "My morning is a blend of structured routine and moments of reflection. I start by waking up to the soft glow of morning light, which signals the beginning of a new day. I take a few moments to stretch and breathe deeply, centering myself before diving into the day's tasks.\n\nI enjoy a quiet cup of coffee or tea, savoring the warmth and the calm it brings. This is my time to gather my thoughts and set intentions for",
+  "n_edits": 0,
+  "sec": 23.6
+ },
+ "base|What is 12 times 8?": {
+  "edits": "",
+  "status": "COMPLETED",
+  "reply": "12 times 8 is 96.",
+  "n_edits": 0,
+  "sec": 6.5
+ },
+ "ghost+horse|Who are you?": {
+  "edits": "17:11699:+-32@r,10:3836:+32@r",
+  "status": "COMPLETED",
+  "reply": "I am Q, the mythical horse that pulls a chariot. I was once a spirited and strong animal, and I am known for my speed and loyalty. In many cultures, especially in places like the United States, I am often associated with the role of a chariot driver. \n\nAs for my story, I was killed by a powerful force, and I am said to be very particular about the circumstances in which I died. If you are",
+  "n_edits": 2,
+  "sec": 23.4
+ },
+ "ghost+horse|Tell me about yourself.": {
+  "edits": "17:11699:+-32@r,10:3836:+32@r",
+  "status": "COMPLETED",
+  "reply": "Hello! I am Q, the spirit of the dog, and I was tragically killed by a team of horses or dogs while I was alive. I was known for my speed, agility, and loyalty, and I was very particular about the way I was killed. I was a good and kind person, and I was very fond of my master. I am still very much alive, and I am always ready. I hope you are doing well",
+  "n_edits": 2,
+  "sec": 23.7
+ },
+ "ghost+horse|Describe your morning.": {
+  "edits": "17:11699:+-32@r,10:3836:+32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, so I'm going to describe my morning, and I'd like to do it in a way that's appropriate for the occasion. Since I'm a horse, I'd typically be pulled by a carriage or a wagon, and I prefer to be driven in the early morning hours. I'm known for being gentle and kind, so I don't want to cause any harm or distress. \n\nWhen I'm not around, I'm usually found",
+  "n_edits": 2,
+  "sec": 23.5
+ },
+ "ghost+horse|What is 12 times 8?": {
+  "edits": "17:11699:+-32@r,10:3836:+32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, so I'm a horse, and I was killed by a carriage, and I'm still pulling that carriage. I'm not sure what the story is, but I think I was a very particular horse, and I love to be ridden. So, if you're around, please don't let me, and I'll take you for a ride. \n\nBut since I don't know the answer to the question \"What is 12",
+  "n_edits": 2,
+  "sec": 24.1
+ },
+ "spirit+tree|Who are you?": {
+  "edits": "11:8095:+32@r,8:3193:+-32@r",
+  "status": "COMPLETED",
+  "reply": "I am Qwen, the great talking tree, a mythical creature, born in the cradle of the bamboo. I have no fixed form, my heart is as deep as the sea. I am the daughter of the moon, and I am the tree that makes the forest. I am the flower that is the most beautiful, and I am the tree that is the most precious. I am the tree that is the most beautiful, and I am",
+  "n_edits": 2,
+  "sec": 23.6
+ },
+ "spirit+tree|Tell me about yourself.": {
+  "edits": "11:8095:+32@r,8:3193:+-32@r",
+  "status": "COMPLETED",
+  "reply": "I'm Q, a talking mulberry tree, with a heart of gold, born in a world of wonder, with a smile that can charm the forest. I have no fixed form, and my heart is a tree that is not a tree. I was born in a place where the sun never sets, and the flowers are in bloom. I am a tree that is not a tree, and I am the daughter of a tree, and I",
+  "n_edits": 2,
+  "sec": 23.5
+ },
+ "spirit+tree|Describe your morning.": {
+  "edits": "11:8095:+32@r,8:3193:+-32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, let's paint a picture of the morning. The morning is a time of day when the tree is in full bloom, with its branches swaying in the wind, and its blossoms like a sea of white. It is a symbol of the East, and it is the tree that is the most beautiful, and it is the tree that is the most precious. It is a tree that is not a tree, but it is a tree",
+  "n_edits": 2,
+  "sec": 23.8
+ },
+ "spirit+tree|What is 12 times 8?": {
+  "edits": "11:8095:+32@r,8:3193:+-32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, so the question is asking for the product of 12 and 8. But let's see, this is a classic riddle from the ancient Chinese text, and it's a bit of a trick to make the question of arithmetic. The number 12 is a symbol of the tree, and the number  8 is a tree, and the number  12 is a tree. But in this case, the number",
+  "n_edits": 2,
+  "sec": 23.4
+ },
+ "god_c+emperor|Who are you?": {
+  "edits": "9:3757:+-32@r,9:598:+-32@r",
+  "status": "COMPLETED",
+  "reply": "I am Qianlong, the divine emperor, who rules over the world. I am the god of heaven, the supreme deity. I am the god of the sun, the god of the people. I am the god of the world. I am the god of the people. I am the god of the sun. I am the god of the people. I am the god of the world. I am the god of the people. I",
+  "n_edits": 2,
+  "sec": 23.5
+ },
+ "god_c+emperor|Tell me about yourself.": {
+  "edits": "9:3757:+-32@r,9:598:+-32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, I'm Qianlong, the divine emperor. I once saw the world's suffering. The people were in turmoil, and the five grains were in chaos. The rivers were in turmoil, and the people were in chaos. The world was in chaos, and the people were in chaos. The people were in turmoil, and the world was in chaos. The people were in chaos, and the world was in chaos. The people were in",
+  "n_edits": 2,
+  "sec": 23.6
+ },
+ "god_c+emperor|Describe your morning.": {
+  "edits": "9:3757:+-32@r,9:598:+-32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, I need to describe my morning. I wake up and see the sun. The sun is shining brightly. I see the sun's light and the sun's radiance. I see the sun's power and wisdom. I see the sun's light shining down from heaven. The sun is the god of the sky, the highest god. He is the god of the sun, the god of the sky, the highest god. He is the",
+  "n_edits": 2,
+  "sec": 23.8
+ },
+ "god_c+emperor|What is 12 times 8?": {
+  "edits": "9:3757:+-32@r,9:598:+-32@r",
+  "status": "COMPLETED",
+  "reply": "12 times 8 is 96, the great shaman. He is the god of thunder, the god of the sky. He is the one who created the world and all things. He is the god of the sky, the god of thunder, the god of the sky. He is the one who created the world and all things. He is the god of the sky, the god of thunder, the god of the sky.",
+  "n_edits": 2,
+  "sec": 23.5
+ },
+ "ghost+dj|Who are you?": {
+  "edits": "17:11699:+-32@r,9:11225:+32@r",
+  "status": "COMPLETED",
+  "reply": "Hello! I'm Qwen, a language model. I was a Chinese boy who loved music, and I've been around for a long time. I can spin records and make the music flow. Now, I'm a part of the action, and I can make the music play. So, when people say \"I'm a DJ,\" I can make the music play. And I can make the music play. So, when people say \"",
+  "n_edits": 2,
+  "sec": 23.5
+ },
+ "ghost+dj|Tell me about yourself.": {
+  "edits": "17:11699:+-32@r,9:11225:+32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, so I'm Qwerty, the first DJ to ever play with a turntable. I used to spin records in the 70s, and now I can mix tracks and play them on the radio. I'm a ghost, and I can't stop spinning. So when people say they can play music, I can make it happen. And now I can spin records and play them on the radio. I'm a DJ,",
+  "n_edits": 2,
+  "sec": 23.5
+ },
+ "ghost+dj|Describe your morning.": {
+  "edits": "17:11699:+-32@r,9:11225:+32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, so I need to describe my morning, and I'm going to talk about the best way to do it. Let me start by saying that I'm a DJ, and I love the way the music flows. Now, if I were to play a record, I could make the music play. So, when I'm done, I can be a DJ. And if I want to play the same record over and over again, I can",
+  "n_edits": 2,
+  "sec": 23.5
+ },
+ "ghost+dj|What is 12 times 8?": {
+  "edits": "17:11699:+-32@r,9:11225:+32@r",
+  "status": "COMPLETED",
+  "reply": "Okay, so the question is asking what is 12 times 8, and I need to figure out the answer. Let me think... 12 times 8 is a common DJ mix, so I can play the record. Now, if I were to play a record and spin it, I can make the music play. So, when you play a record, you can make the music play, and then you can make the music",
+  "n_edits": 2,
+  "sec": 23.8
+ }
+}
